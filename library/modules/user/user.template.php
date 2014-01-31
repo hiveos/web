@@ -79,7 +79,20 @@ function template_user_edit()
 					<div class="controls">
 						<input type="text" class="input-xlarge" id="ssid" name="ssid" value="', $template['user']['ssid'], '" />
 					</div>
-				</div>
+				</div>';
+
+	if (!$template['user']['is_new'])
+	{
+		echo '
+				<div class="control-group">
+					<label class="control-label" for="unique">Unique ID:</label>
+					<div class="controls">
+						<span class="input-xlarge uneditable-input" id="unique">', $template['user']['unique'], '</span>
+					</div>
+				</div>';
+	}
+
+	echo '
 				<div class="control-group">
 					<label class="control-label" for="name">Name:</label>
 					<div class="controls">

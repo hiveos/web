@@ -78,11 +78,24 @@ function register_main()
 		if ($values['password'] !== $values['verify_password'])
 			fatal_error('The passwords entered do not match!');
 
+		$unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 10);
+
+		$request = db_query("
+			SELECT id_user
+			FROM user
+			WHERE id_unique = '$unique'
+			LIMIT 1");
+		list ($duplicate_id) = db_fetch_row($request);
+		db_free_result($request);
+
+		if (!empty($duplicate_id))
+			$unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 10);
+
 		db_query("
 			INSERT INTO user
-				(ssid, name, password, email_address, registered)
+				(id_unique, ssid, name, password, email_address, registered)
 			VALUES
-				('$values[ssid]', '$values[name]', '$values[password]', '$values[email_address]', " . time() . ")");
+				('$unique', '$values[ssid]', '$values[name]', '$values[password]', '$values[email_address]', " . time() . ")");
 
 		redirect(build_url('login'));
 	}

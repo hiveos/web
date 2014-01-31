@@ -65,7 +65,9 @@ function load_user()
 	if (!empty($user['id']))
 	{
 		$request = db_query("
-			SELECT id_user, ssid, name, password, admin
+			SELECT
+				id_user, id_unique, ssid,
+				name, password, admin
 			FROM user
 			WHERE id_user = $user[id]
 			LIMIT 1");
@@ -75,6 +77,7 @@ function load_user()
 
 			$temp = array(
 				'id' => (int) $row['id_user'],
+				'unique' => $row['unique'],
 				'ssid' => $row['ssid'],
 				'name' => $row['name'],
 				'admin' => !empty($row['admin']),
@@ -92,6 +95,7 @@ function load_user()
 	{
 		$user = array(
 			'id' => 0,
+			'unique' => '',
 			'ssid' => '',
 			'name' => '',
 			'admin' => false,

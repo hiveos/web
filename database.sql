@@ -65,6 +65,7 @@ CREATE TABLE IF NOT EXISTS `subject` (
 
 CREATE TABLE IF NOT EXISTS `user` (
   `id_user` mediumint(8) NOT NULL AUTO_INCREMENT,
+  `id_unique` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `ssid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,

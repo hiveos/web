@@ -28,6 +28,12 @@ function template_profile_main()
 					</div>
 				</div>
 				<div class="control-group">
+					<label class="control-label" for="unique">Unique ID:</label>
+					<div class="controls">
+						<span class="input-xlarge uneditable-input" id="unique">', $user['unique'], '</span>
+					</div>
+				</div>
+				<div class="control-group">
 					<label class="control-label" for="name">Name:</label>
 					<div class="controls">
 						<span class="input-xlarge uneditable-input" id="name">', $user['name'], '</span>

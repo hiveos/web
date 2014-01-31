@@ -132,7 +132,23 @@ function user_edit()
 
 		if ($is_new)
 		{
-			$insert = array('registered' => time());
+			$unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 10);
+
+			$request = db_query("
+				SELECT id_user
+				FROM user
+				WHERE id_unique = '$unique'
+				LIMIT 1");
+			list ($duplicate_id) = db_fetch_row($request);
+			db_free_result($request);
+
+			if (!empty($duplicate_id))
+				$unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 10);
+
+			$insert = array(
+				'id_unique' => $unique,
+				'registered' => time(),
+			);
 			foreach ($values as $field => $value)
 				$insert[$field] = "'" . $value . "'";
 
@@ -174,7 +190,7 @@ function user_edit()
 	{
 		$request = db_query("
 			SELECT
-				id_user, ssid, name, email_address, admin,
+				id_user, id_unique, ssid, name, email_address, admin,
 				login_count, last_login, last_password_change
 			FROM user
 			WHERE id_user = $id_user
@@ -184,6 +200,7 @@ function user_edit()
 			$template['user'] = array(
 				'is_new' => false,
 				'id' => $row['id_user'],
+				'unique' => $row['id_unique'],
 				'ssid' => $row['ssid'],
 				'name' => $row['name'],
 				'email_address' => $row['email_address'],
