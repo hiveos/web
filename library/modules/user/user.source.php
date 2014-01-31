@@ -32,16 +32,17 @@ function user_list()
 
 	$request = db_query("
 		SELECT
-			id_user, username, email_address,
+			id_user, ssid, name, email_address,
 			registered, admin
 		FROM user
-		ORDER BY id_user");
+		ORDER BY name");
 	$template['users'] = array();
 	while ($row = db_fetch_assoc($request))
 	{
 		$template['users'][] = array(
 			'id' => $row['id_user'],
-			'username' => $row['username'],
+			'ssid' => $row['ssid'],
+			'name' => $row['name'],
 			'email_address' => $row['email_address'],
 			'registered' => format_time($row['registered']),
 			'admin' => $row['admin'] ? 'Yes' : 'No',
@@ -66,7 +67,8 @@ function user_edit()
 
 		$values = array();
 		$fields = array(
-			'username' => 'username',
+			'ssid' => 'ssid',
+			'name' => 'string',
 			'email_address' => 'email',
 			'password' => 'password',
 			'verify_password' => 'password',
@@ -77,28 +79,32 @@ function user_edit()
 		{
 			if ($type === 'password')
 				$values[$field] = !empty($_POST[$field]) ? sha1($_POST[$field]) : '';
-			elseif ($type === 'username')
-				$values[$field] = !empty($_POST[$field]) && !preg_match('~[^A-Za-z0-9\._]~', $_POST[$field]) ? $_POST[$field] : '';
+			elseif ($type === 'ssid')
+				$values[$field] = !empty($_POST[$field]) && !preg_match('~[^A-Z0-9]~', $_POST[$field]) ? $_POST[$field] : '';
 			elseif ($type === 'email')
 				$values[$field] = !empty($_POST[$field]) && preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST[$field]) ? $_POST[$field] : '';
 			elseif ($type === 'int')
 				$values[$field] = !empty($_POST[$field]) ? (int) $_POST[$field] : 0;
+			elseif ($type === 'string')
+				$values[$field] = !empty($_POST[$field]) ? htmlspecialchars($_POST[$field], ENT_QUOTES) : '';
 		}
 
-		if ($values['username'] === '')
-			fatal_error('You did not enter a valid username!');
+		if ($values['name'] === '')
+			fatal_error('You did not enter a valid name!');
+		elseif ($values['ssid'] === '')
+			fatal_error('You did not enter a valid ID!');
 
 		$request = db_query("
 			SELECT id_user
 			FROM user
-			WHERE username = '$values[username]'
+			WHERE ssid = '$values[ssid]'
 				AND id_user != $id_user
 			LIMIT 1");
 		list ($duplicate_id) = db_fetch_row($request);
 		db_free_result($request);
 
 		if (!empty($duplicate_id))
-			fatal_error('The username entered is already in use!');
+			fatal_error('The ID entered is already in use!');
 
 		if ($values['email_address'] === '')
 			fatal_error('You did not enter a valid email address!');
@@ -158,7 +164,8 @@ function user_edit()
 		$template['user'] = array(
 			'is_new' => true,
 			'id' => 0,
-			'username' => '',
+			'ssid' => '',
+			'name' => '',
 			'email_address' => '',
 			'admin' => 0,
 		);
@@ -167,7 +174,7 @@ function user_edit()
 	{
 		$request = db_query("
 			SELECT
-				id_user, username, email_address, admin,
+				id_user, ssid, name, email_address, admin,
 				login_count, last_login, last_password_change
 			FROM user
 			WHERE id_user = $id_user
@@ -177,7 +184,8 @@ function user_edit()
 			$template['user'] = array(
 				'is_new' => false,
 				'id' => $row['id_user'],
-				'username' => $row['username'],
+				'ssid' => $row['ssid'],
+				'name' => $row['name'],
 				'email_address' => $row['email_address'],
 				'admin' => $row['admin'],
 				'login_count' => $row['login_count'],
@@ -202,7 +210,7 @@ function user_delete()
 	$id_user = !empty($_REQUEST['user']) ? (int) $_REQUEST['user'] : 0;
 
 	$request = db_query("
-		SELECT id_user, username
+		SELECT id_user, name
 		FROM user
 		WHERE id_user = $id_user
 		LIMIT 1");
@@ -210,7 +218,7 @@ function user_delete()
 	{
 		$template['user'] = array(
 			'id' => $row['id_user'],
-			'username' => $row['username'],
+			'name' => $row['name'],
 		);
 	}
 	db_free_result($request);

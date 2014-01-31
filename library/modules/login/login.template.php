@@ -22,9 +22,9 @@ function template_login_main()
 			<fieldset>
 				<legend>User Login</legend>
 				<div class="control-group">
-					<label class="control-label" for="username">Username:</label>
+					<label class="control-label" for="ssid">ID:</label>
 					<div class="controls">
-						<input type="text" class="input-xlarge" id="username" name="username" />
+						<input type="text" class="input-xlarge" id="ssid" name="ssid" />
 					</div>
 				</div>
 				<div class="control-group">

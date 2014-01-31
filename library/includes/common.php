@@ -29,7 +29,7 @@ function load_template()
 		return;
 
 	$request = db_query("
-		SELECT id_user, username
+		SELECT id_user, name
 		FROM online
 		ORDER BY time DESC");
 	$template['online_users'] = array();
@@ -37,7 +37,7 @@ function load_template()
 	{
 		$template['online_users'][] = array(
 			'id' => $row['id_user'],
-			'username' => $row['username'],
+			'name' => $row['name'],
 		);
 	}
 	db_free_result($request);
@@ -65,7 +65,7 @@ function load_user()
 	if (!empty($user['id']))
 	{
 		$request = db_query("
-			SELECT id_user, username, password, admin
+			SELECT id_user, ssid, name, password, admin
 			FROM user
 			WHERE id_user = $user[id]
 			LIMIT 1");
@@ -75,7 +75,8 @@ function load_user()
 
 			$temp = array(
 				'id' => (int) $row['id_user'],
-				'username' => $row['username'],
+				'ssid' => $row['ssid'],
+				'name' => $row['name'],
 				'admin' => !empty($row['admin']),
 				'logged' => true,
 				'session_id' => $core['session_id'],
@@ -91,7 +92,8 @@ function load_user()
 	{
 		$user = array(
 			'id' => 0,
-			'username' => '',
+			'ssid' => '',
+			'name' => '',
 			'admin' => false,
 			'logged' => false,
 			'session_id' => $core['session_id'],
@@ -113,9 +115,9 @@ function load_user()
 
 		db_query("
 			REPLACE INTO online
-				(id_user, username, time)
+				(id_user, name, time)
 			VALUES
-				($user[id], '$user[username]', " . time() . ")");
+				($user[id], '$user[name]', " . time() . ")");
 
 		$_SESSION['log_online'] = time();
 	}
@@ -315,7 +317,7 @@ function template_menu()
 	{
 		echo '
 					<p class="navbar-text pull-right">
-						Logged in as <strong>', $user['username'], '</strong>
+						Logged in as <strong>', $user['name'], '</strong>
 					</p>';
 	}
 
@@ -371,7 +373,7 @@ function template_footer()
 
 		foreach ($template['online_users'] as $user)
 			echo '
-					<span class="label label-info">', $user['username'], '</span> ';
+					<span class="label label-info">', $user['name'], '</span> ';
 
 		echo '
 				</span>

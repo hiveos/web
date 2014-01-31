@@ -53,8 +53,6 @@ function profile_main()
 				$values[$field] = !empty($_POST[$field]) ? sha1($_POST[$field]) : '';
 			elseif ($type === 'email')
 				$values[$field] = !empty($_POST[$field]) && preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST[$field]) ? $_POST[$field] : '';
-			elseif ($type === 'integer')
-				$values[$field] = !empty($_POST[$field]) ? (int) $_POST[$field] : 0;
 		}
 
 		$request = db_query("

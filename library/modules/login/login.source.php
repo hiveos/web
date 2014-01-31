@@ -21,24 +21,24 @@ function login_main()
 	{
 		check_session('login');
 
-		$username = !empty($_POST['username']) ? $_POST['username'] : '';
+		$ssid = !empty($_POST['ssid']) ? $_POST['ssid'] : '';
 		$password = !empty($_POST['password']) ? $_POST['password'] : '';
 
-		if ($username === '' || preg_match('~[^A-Za-z0-9\._]~', $username) || $password === '')
-			fatal_error('Invalid username or password!');
-		$username = htmlspecialchars($username, ENT_QUOTES);
+		if ($ssid === '' || preg_match('~[^A-Z0-9]~', $ssid) || $password === '')
+			fatal_error('Invalid ID or password!');
+		$ssid = htmlspecialchars($ssid, ENT_QUOTES);
 
 		$request = db_query("
-			SELECT id_user, password
+			SELECT id_user, name, password
 			FROM user
-			WHERE username = '$username'
+			WHERE ssid = '$ssid'
 			LIMIT 1");
-		list ($id, $real_password) = db_fetch_row($request);
+		list ($id, $name, $real_password) = db_fetch_row($request);
 		db_free_result($request);
 
 		$hash = sha1($password);
 		if ($hash !== $real_password)
-			fatal_error('Invalid username or password!');
+			fatal_error('Invalid ID or password!');
 
 		create_cookie(60 * 3153600, $id, $hash);
 
@@ -51,9 +51,9 @@ function login_main()
 
 		db_query("
 			REPLACE INTO online
-				(id_user, username, time)
+				(id_user, name, time)
 			VALUES
-				($id, '$username', " . time() . ")");
+				($id, '$name', " . time() . ")");
 
 		redirect(build_url());
 	}

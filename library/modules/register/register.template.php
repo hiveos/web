@@ -22,9 +22,15 @@ function template_register_main()
 			<fieldset>
 				<legend>Register</legend>
 				<div class="control-group">
-					<label class="control-label" for="username">Username:</label>
+					<label class="control-label" for="ssid">ID:</label>
 					<div class="controls">
-						<input type="text" class="input-xlarge" id="username" name="username" />
+						<input type="text" class="input-xlarge" id="ssid" name="ssid" />
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="name">Name:</label>
+					<div class="controls">
+						<input type="text" class="input-xlarge" id="name" name="name" />
 					</div>
 				</div>
 				<div class="control-group">

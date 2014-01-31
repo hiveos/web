@@ -27,7 +27,8 @@ function template_user_list()
 		<table class="table table-striped table-bordered">
 			<thead>
 				<tr>
-					<th>Username</th>
+					<th>ID</th>
+					<th>Name</th>
 					<th>Email Address</th>
 					<th>Registered</th>
 					<th>Admin</th>
@@ -40,7 +41,7 @@ function template_user_list()
 	{
 		echo '
 				<tr>
-					<td class="align_center" colspan="5">There are not any users added yet!</td>
+					<td class="align_center" colspan="6">There are not any users added yet!</td>
 				</tr>';
 	}
 
@@ -48,7 +49,8 @@ function template_user_list()
 	{
 		echo '
 				<tr>
-					<td>', $user['username'], '</td>
+					<td>', $user['ssid'], '</td>
+					<td>', $user['name'], '</td>
 					<td>', $user['email_address'], '</td>
 					<td class="span2 align_center">', $user['registered'], '</td>
 					<td class="align_center">', $user['admin'], '</td>
@@ -73,9 +75,15 @@ function template_user_edit()
 			<fieldset>
 				<legend>', (!$template['user']['is_new'] ? 'Edit' : 'Add'), ' User</legend>
 				<div class="control-group">
-					<label class="control-label" for="username">Username:</label>
+					<label class="control-label" for="ssid">ID:</label>
 					<div class="controls">
-						<input type="text" class="input-xlarge" id="username" name="username" value="', $template['user']['username'], '" />
+						<input type="text" class="input-xlarge" id="ssid" name="ssid" value="', $template['user']['ssid'], '" />
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="name">Name:</label>
+					<div class="controls">
+						<input type="text" class="input-xlarge" id="name" name="name" value="', $template['user']['name'], '" />
 					</div>
 				</div>
 				<div class="control-group">
@@ -148,7 +156,7 @@ function template_user_delete()
 		<form class="form-horizontal" action="', build_url(array('user', 'delete')), '" method="post">
 			<fieldset>
 				<legend>Delete User</legend>
-				Are you sure you want to delete the user &quot;', $template['user']['username'], '&quot;?
+				Are you sure you want to delete the user &quot;', $template['user']['name'], '&quot;?
 				<div class="form-actions">
 					<input type="submit" class="btn btn-danger" name="delete" value="Delete" />
 					<input type="submit" class="btn" name="cancel" value="Cancel" />

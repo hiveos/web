@@ -22,16 +22,40 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `class`
+--
+
+CREATE TABLE IF NOT EXISTS `class` (
+  `id_class` mediumint(8) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`id_class`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `online`
 --
 
 CREATE TABLE IF NOT EXISTS `online` (
   `id_user` mediumint(8) NOT NULL DEFAULT '0',
-  `username` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `time` int(10) NOT NULL DEFAULT '0',
   UNIQUE KEY `id_user` (`id_user`),
   KEY `time` (`time`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `subject`
+--
+
+CREATE TABLE IF NOT EXISTS `subject` (
+  `id_subject` mediumint(8) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`id_subject`)
+) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -41,14 +65,16 @@ CREATE TABLE IF NOT EXISTS `online` (
 
 CREATE TABLE IF NOT EXISTS `user` (
   `id_user` mediumint(8) NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `ssid` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `password` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
   `email_address` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   `registered` int(10) NOT NULL DEFAULT '0',
   `admin` tinyint(4) NOT NULL DEFAULT '0',
   `login_count` mediumint(8) NOT NULL DEFAULT '0',
   `last_login` int(10) NOT NULL DEFAULT '0',
   `last_password_change` int(10) NOT NULL DEFAULT '0',
+  `id_class` mediumint(8) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id_user`),
   KEY `registered` (`registered`)
 ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;

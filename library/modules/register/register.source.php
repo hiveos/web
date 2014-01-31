@@ -23,7 +23,8 @@ function register_main()
 
 		$values = array();
 		$fields = array(
-			'username' => 'username',
+			'ssid' => 'ssid',
+			'name' => 'string',
 			'email_address' => 'email',
 			'password' => 'password',
 			'verify_password' => 'password',
@@ -31,27 +32,31 @@ function register_main()
 
 		foreach ($fields as $field => $type)
 		{
-			if ($type === 'password')
+			if ($type === 'string')
+				$values[$field] = !empty($_POST[$field]) ? htmlspecialchars($_POST[$field], ENT_QUOTES) : '';
+			elseif ($type === 'password')
 				$values[$field] = !empty($_POST[$field]) ? sha1($_POST[$field]) : '';
-			elseif ($type === 'username')
-				$values[$field] = !empty($_POST[$field]) && !preg_match('~[^A-Za-z0-9\._]~', $_POST[$field]) ? $_POST[$field] : '';
+			elseif ($type === 'ssid')
+				$values[$field] = !empty($_POST[$field]) && !preg_match('~[^A-Z0-9]~', $_POST[$field]) ? $_POST[$field] : '';
 			elseif ($type === 'email')
 				$values[$field] = !empty($_POST[$field]) && preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $_POST[$field]) ? $_POST[$field] : '';
 		}
 
-		if ($values['username'] === '')
-			fatal_error('You did not enter a valid username!');
+		if ($values['name'] === '')
+			fatal_error('You did not enter a valid name!');
+		elseif ($values['ssid'] === '')
+			fatal_error('You did not enter a valid ID!');
 
 		$request = db_query("
 			SELECT id_user
 			FROM user
-			WHERE username = '$values[username]'
+			WHERE ssid = '$values[ssid]'
 			LIMIT 1");
 		list ($duplicate_id) = db_fetch_row($request);
 		db_free_result($request);
 
 		if (!empty($duplicate_id))
-			fatal_error('The username entered is already in use!');
+			fatal_error('The ID entered is already in use!');
 
 		if ($values['email_address'] === '')
 			fatal_error('You did not enter a valid email address!');
@@ -75,9 +80,9 @@ function register_main()
 
 		db_query("
 			INSERT INTO user
-				(username, password, email_address, registered)
+				(ssid, name, password, email_address, registered)
 			VALUES
-				('$values[username]', '$values[password]', '$values[email_address]', " . time() . ")");
+				('$values[ssid]', '$values[name]', '$values[password]', '$values[email_address]', " . time() . ")");
 
 		redirect(build_url('login'));
 	}
