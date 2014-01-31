@@ -78,7 +78,7 @@ function register_main()
 		if ($values['password'] !== $values['verify_password'])
 			fatal_error('The passwords entered do not match!');
 
-		$unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 10);
+		$unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 20);
 
 		$request = db_query("
 			SELECT id_user
@@ -89,7 +89,7 @@ function register_main()
 		db_free_result($request);
 
 		if (!empty($duplicate_id))
-			$unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 10);
+			$unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 20);
 
 		db_query("
 			INSERT INTO user

@@ -66,7 +66,7 @@ function db_fetch_assoc($resource)
 function db_free_result($resource)
 {
 	if ($resource)
-		$resource->free;
+		$resource->free();
 }
 
 function db_exit()

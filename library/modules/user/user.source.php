@@ -132,7 +132,7 @@ function user_edit()
 
 		if ($is_new)
 		{
-			$unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 10);
+			$unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 20);
 
 			$request = db_query("
 				SELECT id_user
@@ -143,10 +143,10 @@ function user_edit()
 			db_free_result($request);
 
 			if (!empty($duplicate_id))
-				$unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 10);
+				$unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 20);
 
 			$insert = array(
-				'id_unique' => $unique,
+				'id_unique' => "'" . $unique . "'",
 				'registered' => time(),
 			);
 			foreach ($values as $field => $value)

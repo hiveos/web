@@ -77,7 +77,7 @@ function load_user()
 
 			$temp = array(
 				'id' => (int) $row['id_user'],
-				'unique' => $row['unique'],
+				'unique' => $row['id_unique'],
 				'ssid' => $row['ssid'],
 				'name' => $row['name'],
 				'admin' => !empty($row['admin']),
