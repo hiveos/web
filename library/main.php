@@ -36,7 +36,7 @@ if ($user['logged'])
 else
 	$modules = array_merge($modules, array('login', 'register'));
 if ($user['admin'])
-	$modules = array_merge($modules, array('user'));
+	$modules = array_merge($modules, array('user', 'class', 'subject', 'book'));
 
 $core['current_module'] = 'home';
 if (!empty($_REQUEST['module']) && in_array($_REQUEST['module'], $modules))

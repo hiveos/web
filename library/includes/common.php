@@ -285,6 +285,9 @@ function template_menu()
 		'logout' => 'Logout',
 		'',
 		'user' => 'User',
+		'class' => 'Class',
+		'subject' => 'Subject',
+		'book' => 'Book',
 	);
 
 	echo '
