@@ -30,6 +30,7 @@ function template_user_list()
 					<th>ID</th>
 					<th>Name</th>
 					<th>Email Address</th>
+					<th>Class</th>
 					<th>Registered</th>
 					<th>Admin</th>
 					<th>Actions</th>
@@ -41,7 +42,7 @@ function template_user_list()
 	{
 		echo '
 				<tr>
-					<td class="align_center" colspan="6">There are not any users added yet!</td>
+					<td class="align_center" colspan="7">There are not any users added yet!</td>
 				</tr>';
 	}
 
@@ -49,9 +50,10 @@ function template_user_list()
 	{
 		echo '
 				<tr>
-					<td>', $user['ssid'], '</td>
+					<td class="align_center">', $user['ssid'], '</td>
 					<td>', $user['name'], '</td>
 					<td>', $user['email_address'], '</td>
+					<td class="align_center">', $user['class'], '</td>
 					<td class="span2 align_center">', $user['registered'], '</td>
 					<td class="align_center">', $user['admin'], '</td>
 					<td class="span3 align_center">
@@ -103,6 +105,22 @@ function template_user_edit()
 					<label class="control-label" for="email_address">Email address:</label>
 					<div class="controls">
 						<input type="text" class="input-xlarge" id="email_address" name="email_address" value="', $template['user']['email_address'], '" />
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="id_class">Class:</label>
+					<div class="controls">
+						<select id="id_class" name="id_class">
+							<option value="0"', ($template['user']['class'] == 0 ? ' selected="selected"' : ''), '>Select class</option>';
+
+	foreach ($template['classes'] as $class)
+	{
+		echo '
+							<option value="', $class['id'], '"', ($template['user']['class'] == $class['id'] ? ' selected="selected"' : ''), '>', $class['name'], '</option>';
+	}
+
+	echo '
+						</select>
 					</div>
 				</div>
 				<div class="control-group">

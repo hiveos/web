@@ -28,6 +28,7 @@ function template_book_list()
 			<thead>
 				<tr>
 					<th>Name</th>
+					<th>Subject</th>
 					<th>Actions</th>
 				</tr>
 			</thead>
@@ -37,7 +38,7 @@ function template_book_list()
 	{
 		echo '
 				<tr>
-					<td class="align_center" colspan="2">There are not any books added yet!</td>
+					<td class="align_center" colspan="3">There are not any books added yet!</td>
 				</tr>';
 	}
 
@@ -46,6 +47,7 @@ function template_book_list()
 		echo '
 				<tr>
 					<td>', $book['name'], '</td>
+					<td>', $book['subject'], '</td>
 					<td class="span3 align_center">
 						<a class="btn btn-primary" href="', build_url(array('book', 'edit', $book['id'])), '">Edit</a>
 						<a class="btn btn-danger" href="', build_url(array('book', 'delete', $book['id'])), '">Delete</a>
@@ -70,6 +72,22 @@ function template_book_edit()
 					<label class="control-label" for="name">Name:</label>
 					<div class="controls">
 						<input type="text" class="input-xlarge" id="name" name="name" value="', $template['book']['name'], '" />
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="id_subject">Subject:</label>
+					<div class="controls">
+						<select id="id_subject" name="id_subject">
+							<option value="0"', ($template['book']['subject'] == 0 ? ' selected="selected"' : ''), '>Select subject</option>';
+
+	foreach ($template['subjects'] as $subject)
+	{
+		echo '
+							<option value="', $subject['id'], '"', ($template['book']['subject'] == $subject['id'] ? ' selected="selected"' : ''), '>', $subject['name'], '</option>';
+	}
+
+	echo '
+						</select>
 					</div>
 				</div>
 				<div class="form-actions">

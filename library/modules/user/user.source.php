@@ -32,10 +32,11 @@ function user_list()
 
 	$request = db_query("
 		SELECT
-			id_user, ssid, name, email_address,
-			registered, admin
-		FROM user
-		ORDER BY name");
+			u.id_user, u.ssid, u.name, u.email_address,
+			u.registered, u.admin, c.name AS class
+		FROM user AS u
+			LEFT JOIN class AS c ON (c.id_class = u.id_class)
+		ORDER BY u.name");
 	$template['users'] = array();
 	while ($row = db_fetch_assoc($request))
 	{
@@ -44,6 +45,7 @@ function user_list()
 			'ssid' => $row['ssid'],
 			'name' => $row['name'],
 			'email_address' => $row['email_address'],
+			'class' => $row['class'],
 			'registered' => format_time($row['registered']),
 			'admin' => $row['admin'] ? 'Yes' : 'No',
 		);
@@ -70,6 +72,7 @@ function user_edit()
 			'ssid' => 'ssid',
 			'name' => 'string',
 			'email_address' => 'email',
+			'id_class' => 'int',
 			'password' => 'password',
 			'verify_password' => 'password',
 			'admin' => 'int',
@@ -183,6 +186,7 @@ function user_edit()
 			'ssid' => '',
 			'name' => '',
 			'email_address' => '',
+			'class' => 0,
 			'admin' => 0,
 		);
 	}
@@ -191,7 +195,7 @@ function user_edit()
 		$request = db_query("
 			SELECT
 				id_user, id_unique, ssid, name, email_address, admin,
-				login_count, last_login, last_password_change
+				login_count, last_login, last_password_change, id_class
 			FROM user
 			WHERE id_user = $id_user
 			LIMIT 1");
@@ -204,6 +208,7 @@ function user_edit()
 				'ssid' => $row['ssid'],
 				'name' => $row['name'],
 				'email_address' => $row['email_address'],
+				'class' => $row['id_class'],
 				'admin' => $row['admin'],
 				'login_count' => $row['login_count'],
 				'last_login' => empty($row['last_login']) ? 'Never' : format_time($row['last_login'], 'long'),
@@ -215,6 +220,20 @@ function user_edit()
 		if (!isset($template['user']))
 			fatal_error('The user requested does not exist!');
 	}
+
+	$request = db_query("
+		SELECT id_class, name
+		FROM class
+		ORDER BY name");
+	$template['classes'] = array();
+	while ($row = db_fetch_assoc($request))
+	{
+		$template['classes'][] = array(
+			'id' => $row['id_class'],
+			'name' => $row['name'],
+		);
+	}
+	db_free_result($request);
 
 	$template['page_title'] = (!$is_new ? 'Edit' : 'Add') . ' User';
 	$core['current_template'] = 'user_edit';

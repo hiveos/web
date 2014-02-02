@@ -19,15 +19,17 @@ function profile_main()
 
 	$request = db_query("
 		SELECT
-			email_address, login_count,
-			last_login, last_password_change
-		FROM user
-		WHERE id_user = $user[id]
+			u.email_address, u.login_count, u.last_login,
+			u.last_password_change, c.name AS class
+		FROM user AS u
+			LEFT JOIN class AS c ON (c.id_class = u.id_class)
+		WHERE u.id_user = $user[id]
 		LIMIT 1");
 	while ($row = db_fetch_assoc($request))
 	{
 		$template['profile'] = array(
 			'email_address' => $row['email_address'],
+			'class' => $row['class'],
 			'login_count' => $row['login_count'],
 			'last_login' => empty($row['last_login']) ? 'Never' : format_time($row['last_login'], 'long'),
 			'last_password_change' => empty($row['last_password_change']) ? 'Never' : format_time($row['last_password_change'], 'long'),

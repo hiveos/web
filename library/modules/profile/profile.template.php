@@ -46,6 +46,12 @@ function template_profile_main()
 					</div>
 				</div>
 				<div class="control-group">
+					<label class="control-label" for="class">Class:</label>
+					<div class="controls">
+						<span class="input-xlarge uneditable-input" id="class">', $template['profile']['class'], '</span>
+					</div>
+				</div>
+				<div class="control-group">
 					<label class="control-label" for="choose_password">Choose password:</label>
 					<div class="controls">
 						<input type="password" class="input-xlarge" id="choose_password" name="choose_password" />
