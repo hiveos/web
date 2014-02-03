@@ -228,6 +228,16 @@ function format_time($stamp, $format = 'short')
 	return strftime($formats[$format], $stamp);
 }
 
+function get_photo_src($unique)
+{
+	global $core;
+
+	$base_dir = $core['site_dir'] . '/interface/img/photo_%s.png';
+	$base_src = $core['site_url'] . '/interface/img/photo_%s.png';
+
+	return sprintf($base_src, file_exists(sprintf($base_dir, $unique)) ? $unique : 'default');
+}
+
 function build_url($parts = array(), $quick = true)
 {
 	global $core;
@@ -327,6 +337,7 @@ function template_menu()
 	{
 		echo '
 					<p class="navbar-text pull-right">
+						<img src="', get_photo_src($user['unique']), '" alt="" class="img-circle" />
 						Logged in as <strong>', $user['name'], '</strong>
 					</p>';
 	}

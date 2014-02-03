@@ -32,7 +32,7 @@ function user_list()
 
 	$request = db_query("
 		SELECT
-			u.id_user, u.ssid, u.name, u.email_address,
+			u.id_user, u.id_unique, u.ssid, u.name, u.email_address,
 			u.registered, u.admin, c.name AS class
 		FROM user AS u
 			LEFT JOIN class AS c ON (c.id_class = u.id_class)
@@ -42,6 +42,7 @@ function user_list()
 	{
 		$template['users'][] = array(
 			'id' => $row['id_user'],
+			'unique' => $row['id_unique'],
 			'ssid' => $row['ssid'],
 			'name' => $row['name'],
 			'email_address' => $row['email_address'],
@@ -62,6 +63,49 @@ function user_edit()
 
 	$id_user = !empty($_REQUEST['user']) ? (int) $_REQUEST['user'] : 0;
 	$is_new = empty($id_user);
+
+	if ($is_new)
+	{
+		$template['user'] = array(
+			'is_new' => true,
+			'id' => 0,
+			'ssid' => '',
+			'name' => '',
+			'email_address' => '',
+			'class' => 0,
+			'admin' => 0,
+		);
+	}
+	else
+	{
+		$request = db_query("
+			SELECT
+				id_user, id_unique, ssid, name, email_address, admin,
+				login_count, last_login, last_password_change, id_class
+			FROM user
+			WHERE id_user = $id_user
+			LIMIT 1");
+		while ($row = db_fetch_assoc($request))
+		{
+			$template['user'] = array(
+				'is_new' => false,
+				'id' => $row['id_user'],
+				'unique' => $row['id_unique'],
+				'ssid' => $row['ssid'],
+				'name' => $row['name'],
+				'email_address' => $row['email_address'],
+				'class' => $row['id_class'],
+				'admin' => $row['admin'],
+				'login_count' => $row['login_count'],
+				'last_login' => empty($row['last_login']) ? 'Never' : format_time($row['last_login'], 'long'),
+				'last_password_change' => empty($row['last_password_change']) ? 'Never' : format_time($row['last_password_change'], 'long'),
+			);
+		}
+		db_free_result($request);
+
+		if (!isset($template['user']))
+			fatal_error('The user requested does not exist!');
+	}
 
 	if (!empty($_POST['save']))
 	{
@@ -175,53 +219,31 @@ function user_edit()
 				WHERE id_user = $id_user
 				LIMIT 1");
 		}
+
+		if (!empty($_FILES['photo']) && !empty($_FILES['photo']['name']))
+		{
+			$photo_size = (int) $_FILES['photo']['size'];
+			$photo_extension = htmlspecialchars(strtolower(substr(strrchr($_FILES['photo']['name'], '.'), 1)), ENT_QUOTES);
+			$photo_dir = $core['site_dir'] . '/interface/img/photo_' . ($is_new ? $unique : $template['user']['unique']) . '.' . $photo_extension;
+
+			if (!is_uploaded_file($_FILES['photo']['tmp_name']) || (@ini_get('open_basedir') == '' && !file_exists($_FILES['photo']['tmp_name'])))
+				fatal_error('Photo could not be uploaded!');
+
+			if ($photo_size > 1 * 1024 * 1024)
+				fatal_error('Files cannot be larger than 1 MB!');
+
+			if (!in_array($photo_extension, array('png')))
+				fatal_error('Only files with the following extensions can be uploaded: png');
+
+			@unlink($photo_dir);
+
+			if (!move_uploaded_file($_FILES['photo']['tmp_name'], $photo_dir))
+				fatal_error('File could not be uploaded!');
+		}
 	}
 
 	if (!empty($_POST['save']) || !empty($_POST['cancel']))
 		redirect(build_url('user'));
-
-	if ($is_new)
-	{
-		$template['user'] = array(
-			'is_new' => true,
-			'id' => 0,
-			'ssid' => '',
-			'name' => '',
-			'email_address' => '',
-			'class' => 0,
-			'admin' => 0,
-		);
-	}
-	else
-	{
-		$request = db_query("
-			SELECT
-				id_user, id_unique, ssid, name, email_address, admin,
-				login_count, last_login, last_password_change, id_class
-			FROM user
-			WHERE id_user = $id_user
-			LIMIT 1");
-		while ($row = db_fetch_assoc($request))
-		{
-			$template['user'] = array(
-				'is_new' => false,
-				'id' => $row['id_user'],
-				'unique' => $row['id_unique'],
-				'ssid' => $row['ssid'],
-				'name' => $row['name'],
-				'email_address' => $row['email_address'],
-				'class' => $row['id_class'],
-				'admin' => $row['admin'],
-				'login_count' => $row['login_count'],
-				'last_login' => empty($row['last_login']) ? 'Never' : format_time($row['last_login'], 'long'),
-				'last_password_change' => empty($row['last_password_change']) ? 'Never' : format_time($row['last_password_change'], 'long'),
-			);
-		}
-		db_free_result($request);
-
-		if (!isset($template['user']))
-			fatal_error('The user requested does not exist!');
-	}
 
 	$request = db_query("
 		SELECT id_class, name

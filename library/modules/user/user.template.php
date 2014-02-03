@@ -27,6 +27,7 @@ function template_user_list()
 		<table class="table table-striped table-bordered">
 			<thead>
 				<tr>
+					<th>Photo</th>
 					<th>ID</th>
 					<th>Name</th>
 					<th>Email Address</th>
@@ -50,6 +51,7 @@ function template_user_list()
 	{
 		echo '
 				<tr>
+					<td class="align_center"><img src="', get_photo_src($user['unique']), '" alt="" class="img-polaroid" /></td>
 					<td class="align_center">', $user['ssid'], '</td>
 					<td>', $user['name'], '</td>
 					<td>', $user['email_address'], '</td>
@@ -73,7 +75,7 @@ function template_user_edit()
 	global $user, $template;
 
 	echo '
-		<form class="form-horizontal" action="', build_url(array('user', 'edit')), '" method="post">
+		<form class="form-horizontal" action="', build_url(array('user', 'edit')), '" method="post" enctype="multipart/form-data">
 			<fieldset>
 				<legend>', (!$template['user']['is_new'] ? 'Edit' : 'Add'), ' User</legend>
 				<div class="control-group">
@@ -143,11 +145,23 @@ function template_user_edit()
 							<option value="1"', ($template['user']['admin'] == 1 ? ' selected="selected"' : ''), '>Yes</option>
 						</select>
 					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="photo">', (!$template['user']['is_new'] ? 'Replace' : 'Select'), ' photo:</label>
+					<div class="controls">
+						<input type="file" class="input-xlarge" id="photo" name="photo" />
+					</div>
 				</div>';
 
 	if (!$template['user']['is_new'])
 	{
 		echo '
+				<div class="control-group">
+					<label class="control-label">Current photo:</label>
+					<div class="controls">
+						<img src="', get_photo_src($template['user']['unique']), '" alt="" class="img-polaroid" />
+					</div>
+				</div>
 				<div class="control-group">
 					<label class="control-label" for="login_count">Login count:</label>
 					<div class="controls">
