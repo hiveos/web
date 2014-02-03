@@ -87,6 +87,10 @@ function mynotebook_edit()
 					(" . implode(', ', array_keys($insert)) . ")
 				VALUES
 					(" . implode(', ', $insert) . ")");
+
+			$id_notebook = db_insert_id();
+
+			mkdir($core['storage_dir'] . '/' . $user['ssid'] . '/' . $id_notebook);
 		}
 		else
 		{

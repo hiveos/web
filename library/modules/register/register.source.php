@@ -97,6 +97,8 @@ function register_main()
 			VALUES
 				('$unique', '$values[ssid]', '$values[name]', '$values[password]', '$values[email_address]', " . time() . ")");
 
+		mkdir($core['storage_dir'] . '/' . $values['ssid']);
+
 		redirect(build_url('login'));
 	}
 

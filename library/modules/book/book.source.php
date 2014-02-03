@@ -91,6 +91,10 @@ function book_edit()
 					(" . implode(', ', array_keys($insert)) . ")
 				VALUES
 					(" . implode(', ', $insert) . ")");
+
+			$id_book = db_insert_id();
+
+			mkdir($core['storage_dir'] . '/shared/' . $id_book);
 		}
 		else
 		{

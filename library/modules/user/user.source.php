@@ -160,6 +160,8 @@ function user_edit()
 					(" . implode(', ', array_keys($insert)) . ")
 				VALUES
 					(" . implode(', ', $insert) . ")");
+
+			mkdir($core['storage_dir'] . '/' . $values['ssid']);
 		}
 		else
 		{

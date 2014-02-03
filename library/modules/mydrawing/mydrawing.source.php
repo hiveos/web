@@ -87,6 +87,10 @@ function mydrawing_edit()
 					(" . implode(', ', array_keys($insert)) . ")
 				VALUES
 					(" . implode(', ', $insert) . ")");
+
+			$id_drawing = db_insert_id();
+
+			mkdir($core['storage_dir'] . '/' . $user['ssid'] . '/' . $id_drawing);
 		}
 		else
 		{
