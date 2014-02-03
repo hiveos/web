@@ -47,6 +47,45 @@ CREATE TABLE IF NOT EXISTS `class` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `mybook`
+--
+
+CREATE TABLE IF NOT EXISTS `mybook` (
+  `id_link` mediumint(8) NOT NULL AUTO_INCREMENT,
+  `id_user` mediumint(8) NOT NULL DEFAULT '0',
+  `id_book` mediumint(8) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id_link`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mydrawing`
+--
+
+CREATE TABLE IF NOT EXISTS `mydrawing` (
+  `id_drawing` mediumint(8) NOT NULL AUTO_INCREMENT,
+  `id_user` mediumint(8) NOT NULL DEFAULT '0',
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`id_drawing`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `mynotebook`
+--
+
+CREATE TABLE IF NOT EXISTS `mynotebook` (
+  `id_notebook` mediumint(8) NOT NULL AUTO_INCREMENT,
+  `id_user` mediumint(8) NOT NULL DEFAULT '0',
+  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  PRIMARY KEY (`id_notebook`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `online`
 --
 
