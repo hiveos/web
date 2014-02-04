@@ -65,7 +65,7 @@ function template_book_edit()
 	global $user, $template;
 
 	echo '
-		<form class="form-horizontal" action="', build_url(array('book', 'edit')), '" method="post">
+		<form class="form-horizontal" action="', build_url(array('book', 'edit')), '" method="post" enctype="multipart/form-data">
 			<fieldset>
 				<legend>', (!$template['book']['is_new'] ? 'Edit' : 'Add'), ' Book</legend>
 				<div class="control-group">
@@ -88,6 +88,12 @@ function template_book_edit()
 
 	echo '
 						</select>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="file">', (!$template['book']['is_new'] ? 'Replace' : 'Select'), ' package:</label>
+					<div class="controls">
+						<input type="file" class="input-xlarge" id="file" name="file" />
 					</div>
 				</div>
 				<div class="form-actions">

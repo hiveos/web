@@ -108,6 +108,27 @@ function book_edit()
 				WHERE id_book = $id_book
 				LIMIT 1");
 		}
+
+		if (!empty($_FILES['file']) && !empty($_FILES['file']['name']))
+		{
+			$file_size = (int) $_FILES['file']['size'];
+			$file_extension = htmlspecialchars(strtolower(substr(strrchr($_FILES['file']['name'], '.'), 1)), ENT_QUOTES);
+			$file_dir = $core['storage_dir'] . '/shared/' . $id_book . '/pack.' . $file_extension;
+
+			if (!is_uploaded_file($_FILES['file']['tmp_name']) || (@ini_get('open_basedir') == '' && !file_exists($_FILES['file']['tmp_name'])))
+				fatal_error('File could not be uploaded!');
+
+			if ($file_size > 1 * 1024 * 1024)
+				fatal_error('Files cannot be larger than 5 MB!');
+
+			if (!in_array($file_extension, array('zip')))
+				fatal_error('Only files with the following extensions can be uploaded: zip');
+
+			@unlink($file_dir);
+
+			if (!move_uploaded_file($_FILES['file']['tmp_name'], $file_dir))
+				fatal_error('File could not be uploaded!');
+		}
 	}
 
 	if (!empty($_POST['save']) || !empty($_POST['cancel']))

@@ -230,15 +230,15 @@ function user_edit()
 				fatal_error('Photo could not be uploaded!');
 
 			if ($photo_size > 1 * 1024 * 1024)
-				fatal_error('Files cannot be larger than 1 MB!');
+				fatal_error('Photo cannot be larger than 1 MB!');
 
 			if (!in_array($photo_extension, array('png')))
-				fatal_error('Only files with the following extensions can be uploaded: png');
+				fatal_error('Only photos with the following extensions can be uploaded: png');
 
 			@unlink($photo_dir);
 
 			if (!move_uploaded_file($_FILES['photo']['tmp_name'], $photo_dir))
-				fatal_error('File could not be uploaded!');
+				fatal_error('Photo could not be uploaded!');
 		}
 	}
 
