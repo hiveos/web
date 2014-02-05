@@ -72,6 +72,36 @@ function template_mynotebook_edit()
 						<input type="text" class="input-xlarge" id="name" name="name" value="', $template['notebook']['name'], '" />
 					</div>
 				</div>
+				<div class="control-group">
+					<label class="control-label" for="style">Style:</label>
+					<div class="controls">
+						<select id="style" name="style">';
+
+	foreach ($template['styles'] as $style)
+	{
+		echo '
+							<option value="', $style['id'], '"', ($template['notebook']['style'] == $style['id'] ? ' selected="selected"' : ''), '>', $style['name'], '</option>';
+	}
+
+	echo '
+						</select>
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="color">Color:</label>
+					<div class="controls">
+						<select id="color" name="color">';
+
+	foreach ($template['colors'] as $color)
+	{
+		echo '
+							<option value="', $color['id'], '"', ($template['notebook']['color'] == $color['id'] ? ' selected="selected"' : ''), '>', $color['name'], '</option>';
+	}
+
+	echo '
+						</select>
+					</div>
+				</div>
 				<div class="form-actions">
 					<input type="submit" class="btn btn-primary" name="save" value="Save changes" />
 					<input type="submit" class="btn" name="cancel" value="Cancel" />

@@ -30,8 +30,22 @@ function mynotebook_list()
 {
 	global $core, $template, $user;
 
+	$styles = array(
+		0 => 'Plain',
+		1 => 'Type 1',
+		2 => 'Type 2',
+	);
+
+	$colors = array(
+		0 => 'White',
+		1 => 'Black',
+		2 => 'Red',
+		3 => 'Green',
+		4 => 'Blue',
+	);
+
 	$request = db_query("
-		SELECT id_notebook, name
+		SELECT id_notebook, name, style, color
 		FROM mynotebook
 		WHERE id_user = $user[id]
 		ORDER BY name");
@@ -41,6 +55,8 @@ function mynotebook_list()
 		$template['notebooks'][] = array(
 			'id' => $row['id_notebook'],
 			'name' => $row['name'],
+			'style' => $styles[$row['style']],
+			'color' => $colors[$row['color']],
 		);
 	}
 	db_free_result($request);
@@ -63,12 +79,16 @@ function mynotebook_edit()
 		$values = array();
 		$fields = array(
 			'name' => 'string',
+			'style' => 'int',
+			'color' => 'int',
 		);
 
 		foreach ($fields as $field => $type)
 		{
 			if ($type === 'string')
 				$values[$field] = !empty($_POST[$field]) ? htmlspecialchars($_POST[$field], ENT_QUOTES) : '';
+			elseif ($type === 'int')
+				$values[$field] = !empty($_POST[$field]) ? (int) $_POST[$field] : 0;
 		}
 
 		if ($values['name'] === '')
@@ -115,12 +135,14 @@ function mynotebook_edit()
 			'is_new' => true,
 			'id' => 0,
 			'name' => '',
+			'style' => 0,
+			'color' => 0,
 		);
 	}
 	else
 	{
 		$request = db_query("
-			SELECT id_notebook, name
+			SELECT id_notebook, name, style, color
 			FROM mynotebook
 			WHERE id_notebook = $id_notebook
 			LIMIT 1");
@@ -130,6 +152,8 @@ function mynotebook_edit()
 				'is_new' => false,
 				'id' => $row['id_notebook'],
 				'name' => $row['name'],
+				'style' => $row['style'],
+				'color' => $row['color'],
 			);
 		}
 		db_free_result($request);
@@ -137,6 +161,20 @@ function mynotebook_edit()
 		if (!isset($template['notebook']))
 			fatal_error('The notebook requested does not exist!');
 	}
+
+	$template['styles'] = array(
+		0 => 'Plain',
+		1 => 'Type 1',
+		2 => 'Type 2',
+	);
+
+	$template['colors'] = array(
+		0 => 'White',
+		1 => 'Black',
+		2 => 'Red',
+		3 => 'Green',
+		4 => 'Blue',
+	);
 
 	$template['page_title'] = (!$is_new ? 'Edit' : 'Add') . ' Notebook';
 	$core['current_template'] = 'mynotebook_edit';
