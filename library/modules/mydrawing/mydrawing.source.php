@@ -90,7 +90,7 @@ function mydrawing_edit()
 
 			$id_drawing = db_insert_id();
 
-			mkdir($core['storage_dir'] . '/' . $user['ssid'] . '/' . $id_drawing);
+			mkdir($core['storage_dir'] . '/' . $user['ssid'] . '/d' . $id_drawing);
 		}
 		else
 		{

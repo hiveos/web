@@ -77,10 +77,10 @@ function template_mynotebook_edit()
 					<div class="controls">
 						<select id="style" name="style">';
 
-	foreach ($template['styles'] as $style)
+	foreach ($template['styles'] as $id => $label)
 	{
 		echo '
-							<option value="', $style['id'], '"', ($template['notebook']['style'] == $style['id'] ? ' selected="selected"' : ''), '>', $style['name'], '</option>';
+							<option value="', $id, '"', ($template['notebook']['style'] == $id ? ' selected="selected"' : ''), '>', $label, '</option>';
 	}
 
 	echo '
@@ -92,10 +92,10 @@ function template_mynotebook_edit()
 					<div class="controls">
 						<select id="color" name="color">';
 
-	foreach ($template['colors'] as $color)
+	foreach ($template['colors'] as $id => $label)
 	{
 		echo '
-							<option value="', $color['id'], '"', ($template['notebook']['color'] == $color['id'] ? ' selected="selected"' : ''), '>', $color['name'], '</option>';
+							<option value="', $id, '"', ($template['notebook']['color'] == $id ? ' selected="selected"' : ''), '>', $label, '</option>';
 	}
 
 	echo '

@@ -110,7 +110,7 @@ function mynotebook_edit()
 
 			$id_notebook = db_insert_id();
 
-			mkdir($core['storage_dir'] . '/' . $user['ssid'] . '/' . $id_notebook);
+			mkdir($core['storage_dir'] . '/' . $user['ssid'] . '/n' . $id_notebook);
 		}
 		else
 		{
