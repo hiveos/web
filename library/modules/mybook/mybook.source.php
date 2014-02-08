@@ -31,19 +31,16 @@ function mybook_list()
 	global $core, $template, $user;
 
 	$request = db_query("
-		SELECT m.id_book, b.name, s.name AS subject
-		FROM mybook AS m
-			INNER JOIN book AS b ON (b.id_book = m.id_book)
-			INNER JOIN subject AS s ON (s.id_subject = b.id_subject)
-		WHERE m.id_user = $user[id]
-		ORDER BY b.name");
+		SELECT id_book, name
+		FROM mybook
+		WHERE id_user = $user[id]
+		ORDER BY name");
 	$template['books'] = array();
 	while ($row = db_fetch_assoc($request))
 	{
 		$template['books'][] = array(
 			'id' => $row['id_book'],
 			'name' => $row['name'],
-			'subject' => $row['subject'],
 		);
 	}
 	db_free_result($request);
@@ -55,6 +52,24 @@ function mybook_list()
 function mybook_add()
 {
 	global $core, $template, $user;
+
+	$request = db_query("
+		SELECT id_book, name
+		FROM book
+		WHERE FIND_IN_SET($user[id_class], class)
+		ORDER BY name");
+	$template['books'] = array();
+	while ($row = db_fetch_assoc($request))
+	{
+		$template['books'][$row['id_book']] = array(
+			'id' => $row['id_book'],
+			'name' => $row['name'],
+		);
+	}
+	db_free_result($request);
+
+	if (empty($template['books']))
+		fatal_error('There are no books available to add!');
 
 	if (!empty($_POST['save']))
 	{
@@ -73,8 +88,16 @@ function mybook_add()
 
 		if ($values['id_book'] === 0)
 			fatal_error('Book field cannot be empty!');
+		elseif (!isset($template['books'][$values['id_book']]))
+			fatal_error('The book selected is not valid!');
+		else
+		{
+			$id_parent = $values['id_book'];
+			unset($values['id_book']);
+		}
 
 		$insert = array(
+			'name' => "'" . $template['books'][$id_parent]['name'] . "'",
 			'id_user' => $user['id'],
 		);
 		foreach ($values as $field => $value)
@@ -85,29 +108,31 @@ function mybook_add()
 				(" . implode(', ', array_keys($insert)) . ")
 			VALUES
 				(" . implode(', ', $insert) . ")");
+
+		$id_book = db_insert_id();
+
+		$book_dir = $core['storage_dir'] . '/' . $user['ssid'] . '/b' . $id_book;
+		$parent_dir = $core['storage_dir'] . '/shared/' . $id_parent;
+
+		mkdir($book_dir);
+
+		if (($handle = opendir($parent_dir)))
+		{
+			while ($file = readdir($handle))
+			{
+				if (in_array($file, array('.', '..')))
+					continue;
+
+				if (is_file($parent_dir . '/' . $file))
+					copy($parent_dir . '/' . $file, $book_dir . '/' . $file);
+			}
+
+			closedir($current_dir);
+		}
 	}
 
 	if (!empty($_POST['save']) || !empty($_POST['cancel']))
 		redirect(build_url('mybook'));
-
-	$request = db_query("
-		SELECT b.id_book, b.name
-		FROM book AS b
-			LEFT JOIN mybook AS m ON (m.id_book = b.id_book AND m.id_user = $user[id])
-		WHERE IFNULL(m.id_link, 0) = 0
-		ORDER BY b.name");
-	$template['books'] = array();
-	while ($row = db_fetch_assoc($request))
-	{
-		$template['books'][] = array(
-			'id' => $row['id_book'],
-			'name' => $row['name'],
-		);
-	}
-	db_free_result($request);
-
-	if (empty($template['books']))
-		fatal_error('There are no books available to add!');
 
 	$template['page_title'] = 'Add Book';
 	$core['current_template'] = 'mybook_add';
@@ -120,11 +145,10 @@ function mybook_delete()
 	$id_book = !empty($_REQUEST['mybook']) ? (int) $_REQUEST['mybook'] : 0;
 
 	$request = db_query("
-		SELECT m.id_book, b.name
-		FROM mybook AS m
-			INNER JOIN book AS b ON (b.id_book = m.id_book)
-		WHERE m.id_book = $id_book
-			AND m.id_user = $user[id]
+		SELECT id_book, name
+		FROM mybook
+		WHERE id_book = $id_book
+			AND id_user = $user[id]
 		LIMIT 1");
 	while ($row = db_fetch_assoc($request))
 	{

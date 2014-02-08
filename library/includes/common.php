@@ -66,8 +66,8 @@ function load_user()
 	{
 		$request = db_query("
 			SELECT
-				id_user, id_unique, ssid,
-				name, password, admin
+				id_user, id_unique, ssid, name,
+				password, id_class, admin
 			FROM user
 			WHERE id_user = $user[id]
 			LIMIT 1");
@@ -80,6 +80,7 @@ function load_user()
 				'unique' => $row['id_unique'],
 				'ssid' => $row['ssid'],
 				'name' => $row['name'],
+				'id_class' => $row['id_class'],
 				'admin' => !empty($row['admin']),
 				'logged' => true,
 				'session_id' => $core['session_id'],
@@ -98,6 +99,7 @@ function load_user()
 			'unique' => '',
 			'ssid' => '',
 			'name' => '',
+			'id_class' => 0,
 			'admin' => false,
 			'logged' => false,
 			'session_id' => $core['session_id'],

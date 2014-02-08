@@ -28,7 +28,6 @@ function template_mybook_list()
 			<thead>
 				<tr>
 					<th>Name</th>
-					<th>Subject</th>
 					<th>Actions</th>
 				</tr>
 			</thead>
@@ -38,7 +37,7 @@ function template_mybook_list()
 	{
 		echo '
 				<tr>
-					<td class="align_center" colspan="3">There are not any books added yet!</td>
+					<td class="align_center" colspan="2">There are not any books added yet!</td>
 				</tr>';
 	}
 
@@ -47,7 +46,6 @@ function template_mybook_list()
 		echo '
 				<tr>
 					<td>', $book['name'], '</td>
-					<td>', $book['subject'], '</td>
 					<td class="span3 align_center">
 						<a class="btn btn-danger" href="', build_url(array('mybook', 'delete', $book['id'])), '">Delete</a>
 					</td>
