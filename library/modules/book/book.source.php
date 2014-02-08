@@ -65,6 +65,7 @@ function book_edit()
 		$fields = array(
 			'name' => 'string',
 			'id_subject' => 'int',
+			'class' => 'array_int',
 		);
 
 		foreach ($fields as $field => $type)
@@ -73,12 +74,24 @@ function book_edit()
 				$values[$field] = !empty($_POST[$field]) ? htmlspecialchars($_POST[$field], ENT_QUOTES) : '';
 			elseif ($type === 'int')
 				$values[$field] = !empty($_POST[$field]) ? (int) $_POST[$field] : 0;
+			elseif ($type === 'array_int')
+			{
+				$values[$field] = array();
+				if (!empty($_POST[$field]) && is_array($_POST[$field]))
+				{
+					foreach ($_POST[$field] as $value)
+						$values[$field][] = (int) $value;
+				}
+				$values[$field] = implode(',', $values[$field]);
+			}
 		}
 
 		if ($values['name'] === '')
 			fatal_error('Book name field cannot be empty!');
 		elseif ($values['id_subject'] === 0)
 			fatal_error('Book subject field cannot be empty!');
+		elseif ($values['class'] === '')
+			fatal_error('Book classes field cannot be empty!');
 
 		if ($is_new)
 		{
@@ -128,6 +141,15 @@ function book_edit()
 
 			if (!move_uploaded_file($_FILES['file']['tmp_name'], $file_dir))
 				fatal_error('File could not be uploaded!');
+
+			$pack = new ZipArchive;
+			if ($pack->open($file_dir) === true)
+			{
+				$pack->extractTo(dirname($file_dir));
+				$pack->close();
+			}
+			else
+				fatal_error('File could not be extracted!');
 		}
 	}
 
@@ -141,12 +163,13 @@ function book_edit()
 			'id' => 0,
 			'name' => '',
 			'subject' => 0,
+			'class' => array(),
 		);
 	}
 	else
 	{
 		$request = db_query("
-			SELECT id_book, name, id_subject
+			SELECT id_book, name, id_subject, class
 			FROM book
 			WHERE id_book = $id_book
 			LIMIT 1");
@@ -157,6 +180,7 @@ function book_edit()
 				'id' => $row['id_book'],
 				'name' => $row['name'],
 				'subject' => $row['id_subject'],
+				'class' => !empty($row['class']) ? explode(',', $row['class']) : array(),
 			);
 		}
 		db_free_result($request);
@@ -181,6 +205,23 @@ function book_edit()
 
 	if (empty($template['subjects']))
 		fatal_error('There are no subjects added yet! You cannot add books without subjects!');
+
+	$request = db_query("
+		SELECT id_class, name
+		FROM class
+		ORDER BY name");
+	$template['classes'] = array();
+	while ($row = db_fetch_assoc($request))
+	{
+		$template['classes'][] = array(
+			'id' => $row['id_class'],
+			'name' => $row['name'],
+		);
+	}
+	db_free_result($request);
+
+	if (empty($template['classes']))
+		fatal_error('There are no classes added yet! You cannot add books without classes!');
 
 	$template['page_title'] = (!$is_new ? 'Edit' : 'Add') . ' Book';
 	$core['current_template'] = 'book_edit';

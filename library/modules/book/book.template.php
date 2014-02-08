@@ -91,6 +91,21 @@ function template_book_edit()
 					</div>
 				</div>
 				<div class="control-group">
+					<label class="control-label" for="class">Classes:</label>
+					<div class="controls">
+						<select id="class" name="class[]" size="5" multiple="multiple">';
+
+	foreach ($template['classes'] as $class)
+	{
+		echo '
+							<option value="', $class['id'], '"', (in_array($class['id'], $template['book']['class']) ? ' selected="selected"' : ''), '>', $class['name'], '</option>';
+	}
+
+	echo '
+						</select>
+					</div>
+				</div>
+				<div class="control-group">
 					<label class="control-label" for="file">', (!$template['book']['is_new'] ? 'Replace' : 'Select'), ' package:</label>
 					<div class="controls">
 						<input type="file" class="input-xlarge" id="file" name="file" />
