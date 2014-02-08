@@ -83,3 +83,8 @@ hr
 	float: right;
 	margin: 0.4em 0.5em;
 }
+.content_page
+{
+	text-align: center;
+	padding: 1em;
+}

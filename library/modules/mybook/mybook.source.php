@@ -17,7 +17,7 @@ function mybook_main()
 {
 	global $core;
 
-	$actions = array('list', 'add', 'delete');
+	$actions = array('list', 'view', 'add', 'delete');
 
 	$core['current_action'] = 'list';
 	if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $actions))
@@ -47,6 +47,61 @@ function mybook_list()
 
 	$template['page_title'] = 'Book List';
 	$core['current_template'] = 'mybook_list';
+}
+
+function mybook_view()
+{
+	global $core, $template, $user;
+
+	$id_book = !empty($_REQUEST['mybook']) ? (int) $_REQUEST['mybook'] : 0;
+	$page = !empty($_REQUEST['view']) ? (int) $_REQUEST['view'] : 0;
+	$book_dir = $core['storage_dir'] . '/' . $user['ssid'] . '/b' . $id_book;
+
+	$request = db_query("
+		SELECT id_book, name
+		FROM mybook
+		WHERE id_book = $id_book
+			AND id_user = $user[id]
+		LIMIT 1");
+	while ($row = db_fetch_assoc($request))
+	{
+		$template['book'] = array(
+			'id' => $row['id_book'],
+			'name' => $row['name'],
+		);
+	}
+	db_free_result($request);
+
+	if (!isset($template['book']) || !file_exists($book_dir))
+		fatal_error('The book requested does not exist!');
+
+	$pages = array();
+
+	if (($handle = opendir($book_dir)))
+	{
+		while ($file = readdir($handle))
+		{
+			if (preg_match('~page(\d+).jpg$~', $file, $match))
+				$pages[] = $match[1];
+		}
+
+		natsort($pages);
+
+		closedir($handle);
+	}
+
+	if (empty($pages))
+		fatal_error('There are no pages in the requested book!');
+	elseif (!in_array($page, $pages))
+		$page = current($pages);
+
+	$template['book']['page'] = $page;
+	$template['book']['pages'] = count($pages);
+	$template['book']['previous'] = $page > 1;
+	$template['book']['next'] = $page < count($pages);
+
+	$template['page_title'] = 'View Book';
+	$core['current_template'] = 'mybook_view';
 }
 
 function mybook_add()
@@ -127,7 +182,7 @@ function mybook_add()
 					copy($parent_dir . '/' . $file, $book_dir . '/' . $file);
 			}
 
-			closedir($current_dir);
+			closedir($handle);
 		}
 	}
 
@@ -152,14 +207,14 @@ function mybook_delete()
 		LIMIT 1");
 	while ($row = db_fetch_assoc($request))
 	{
-		$template['mybook'] = array(
+		$template['book'] = array(
 			'id' => $row['id_book'],
 			'name' => $row['name'],
 		);
 	}
 	db_free_result($request);
 
-	if (!isset($template['mybook']))
+	if (!isset($template['book']))
 		fatal_error('The book requested does not exist!');
 
 	if (!empty($_POST['delete']))

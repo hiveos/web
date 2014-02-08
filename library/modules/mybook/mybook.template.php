@@ -47,6 +47,7 @@ function template_mybook_list()
 				<tr>
 					<td>', $book['name'], '</td>
 					<td class="span3 align_center">
+						<a class="btn btn-info" href="', build_url(array('mybook', 'view', $book['id'])), '">View</a>
 						<a class="btn btn-danger" href="', build_url(array('mybook', 'delete', $book['id'])), '">Delete</a>
 					</td>
 				</tr>';
@@ -55,6 +56,31 @@ function template_mybook_list()
 	echo '
 			</tbody>
 		</table>';
+}
+
+function template_mybook_view()
+{
+	global $template;
+
+	echo '
+		<div class="page-header">
+			<div class="pull-right">';
+
+	if ($template['book']['previous'])
+		echo '
+				<a class="btn" href="', build_url(array('mybook', 'view', $template['book']['id'], $template['book']['page'] - 1)), '">Previous Page</a>';
+
+	if ($template['book']['next'])
+		echo '
+				<a class="btn" href="', build_url(array('mybook', 'view', $template['book']['id'], $template['book']['page'] + 1)), '">Next Page</a>';
+
+	echo '
+			</div>
+			<h2>View Book - ', $template['book']['name'], ' - Page ', $template['book']['page'], ' of ', $template['book']['pages'], '</h2>
+		</div>
+		<div class="content_page">
+			<img src="', build_url(array('output', 'book', $template['book']['page'], $template['book']['id'])), '" alt="" class="img-polaroid" />
+		</div>';
 }
 
 function template_mybook_add()
@@ -98,13 +124,13 @@ function template_mybook_delete()
 		<form class="form-horizontal" action="', build_url(array('mybook', 'delete')), '" method="post">
 			<fieldset>
 				<legend>Delete Book</legend>
-				Are you sure you want to delete the book &quot;', $template['mybook']['name'], '&quot;?
+				Are you sure you want to delete the book &quot;', $template['book']['name'], '&quot;?
 				<div class="form-actions">
 					<input type="submit" class="btn btn-danger" name="delete" value="Delete" />
 					<input type="submit" class="btn" name="cancel" value="Cancel" />
 				</div>
 			</fieldset>
-			<input type="hidden" name="mybook" value="', $template['mybook']['id'], '" />
+			<input type="hidden" name="mybook" value="', $template['book']['id'], '" />
 			<input type="hidden" name="session_id" value="', $user['session_id'], '" />
 		</form>';
 }
