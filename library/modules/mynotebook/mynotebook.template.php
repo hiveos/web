@@ -68,12 +68,23 @@ function template_mynotebook_view()
 			<div class="pull-right">';
 
 	if ($template['notebook']['previous'])
+	{
 		echo '
 				<a class="btn" href="', build_url(array('mynotebook', 'view', $template['notebook']['id'], $template['notebook']['page'] - 1)), '">Previous Page</a>';
+	}
 
 	if ($template['notebook']['next'])
+	{
 		echo '
 				<a class="btn" href="', build_url(array('mynotebook', 'view', $template['notebook']['id'], $template['notebook']['page'] + 1)), '">Next Page</a>';
+	}
+
+	if ($template['notebook']['pages'] > 1)
+	{
+		echo '
+				<input type="text" class="input-mini pull-right" id="page" name="page" value="', $template['notebook']['page'], '" />
+				<a class="btn" id="page_button" href="', build_url(array('mynotebook', 'view', $template['notebook']['id'], '')), '" onclick="set_page();">Go to Page</a>';
+	}
 
 	echo '
 			</div>
@@ -81,7 +92,13 @@ function template_mynotebook_view()
 		</div>
 		<div class="content_page">
 			<img src="', build_url(array('output', 'notebook', $template['notebook']['page'], $template['notebook']['id'])), '" alt="" class="img-polaroid" />
-		</div>';
+		</div>
+		<script type="text/javascript"><!-- // --><![CDATA[
+			function set_page()
+			{
+				document.getElementById(\'page_button\').href += document.getElementById(\'page\').value;
+			}
+		// ]]></script>';
 }
 
 function template_mynotebook_edit()

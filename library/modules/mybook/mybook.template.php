@@ -67,12 +67,23 @@ function template_mybook_view()
 			<div class="pull-right">';
 
 	if ($template['book']['previous'])
+	{
 		echo '
 				<a class="btn" href="', build_url(array('mybook', 'view', $template['book']['id'], $template['book']['page'] - 1)), '">Previous Page</a>';
+	}
 
 	if ($template['book']['next'])
+	{
 		echo '
 				<a class="btn" href="', build_url(array('mybook', 'view', $template['book']['id'], $template['book']['page'] + 1)), '">Next Page</a>';
+	}
+
+	if ($template['book']['pages'] > 1)
+	{
+		echo '
+				<input type="text" class="input-mini pull-right" id="page" name="page" value="', $template['book']['page'], '" />
+				<a class="btn" id="page_button" href="', build_url(array('mybook', 'view', $template['book']['id'], '')), '" onclick="set_page();">Go to Page</a>';
+	}
 
 	echo '
 			</div>
@@ -80,7 +91,13 @@ function template_mybook_view()
 		</div>
 		<div class="content_page">
 			<img src="', build_url(array('output', 'book', $template['book']['page'], $template['book']['id'])), '" alt="" class="img-polaroid" />
-		</div>';
+		</div>
+		<script type="text/javascript"><!-- // --><![CDATA[
+			function set_page()
+			{
+				document.getElementById(\'page_button\').href += document.getElementById(\'page\').value;
+			}
+		// ]]></script>';
 }
 
 function template_mybook_add()
