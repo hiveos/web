@@ -71,6 +71,7 @@ function api_login()
 		'class' => $api_user['class_name'],
 		'ssid' => $api_user['ssid'],
 		'unique' => $api_user['unique'],
+		'admin' => $api_user['admin'] ? 1 : 0,
 	);
 
 	$output = array();
