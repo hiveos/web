@@ -47,7 +47,7 @@ function api_main()
 	if (empty($api_user))
 		exit('Sorry, the ID provided is not valid!');
 
-	$actions = array('none', 'login');
+	$actions = array('none', 'login', 'books', 'notebooks', 'drawings');
 
 	$core['current_action'] = 'none';
 	if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $actions))
@@ -76,7 +76,129 @@ function api_login()
 	$output = array();
 	foreach ($data as $key => $value)
 		$output[] = $key . '=' . $value;
-	$output = implode('&', $output);
+	$output = implode(',', $output);
+
+	exit($output);
+}
+
+function api_books()
+{
+	global $api_user;
+
+	$request = db_query("
+		SELECT id_book, name
+		FROM mybook
+		WHERE id_user = $api_user[id]
+		ORDER BY name");
+	$books = array();
+	while ($row = db_fetch_assoc($request))
+	{
+		$books[] = array(
+			'id' => $row['id_book'],
+			'name' => $row['name'],
+			'cover' => build_url(array(
+				'module' => 'api',
+				'unique' => $api_user['unique'],
+				'action' => 'output',
+				'type' => 'book',
+				'page' => 1,
+				'book' => $row['id_book'],
+			), false),
+		);
+	}
+	db_free_result($request);
+
+	$output = array();
+	foreach ($books as $data)
+	{
+		$item = array();
+		foreach ($data as $key => $value)
+			$item[] = $key . '=' . $value;
+		$output[] = implode(',', $item);
+	}
+	$output = implode(";\n", $output);
+
+	exit($output);
+}
+
+function api_notebooks()
+{
+	global $api_user;
+
+	$request = db_query("
+		SELECT id_notebook, name, style, color
+		FROM mynotebook
+		WHERE id_user = $api_user[id]
+		ORDER BY name");
+	$notebooks = array();
+	while ($row = db_fetch_assoc($request))
+	{
+		$notebooks[] = array(
+			'id' => $row['id_notebook'],
+			'name' => $row['name'],
+			'style' => $row['style'],
+			'color' => $row['color'],
+			'cover' => build_url(array(
+				'module' => 'api',
+				'unique' => $api_user['unique'],
+				'action' => 'output',
+				'type' => 'notebook',
+				'page' => 1,
+				'notebook' => $row['id_notebook'],
+			), false),
+		);
+	}
+	db_free_result($request);
+
+	$output = array();
+	foreach ($notebooks as $data)
+	{
+		$item = array();
+		foreach ($data as $key => $value)
+			$item[] = $key . '=' . $value;
+		$output[] = implode(',', $item);
+	}
+	$output = implode(";\n", $output);
+
+	exit($output);
+}
+
+function api_drawings()
+{
+	global $api_user;
+
+	$request = db_query("
+		SELECT id_drawing, name
+		FROM mydrawing
+		WHERE id_user = $api_user[id]
+		ORDER BY name");
+	$drawings = array();
+	while ($row = db_fetch_assoc($request))
+	{
+		$drawings[] = array(
+			'id' => $row['id_drawing'],
+			'name' => $row['name'],
+			'cover' => build_url(array(
+				'module' => 'api',
+				'unique' => $api_user['unique'],
+				'action' => 'output',
+				'type' => 'drawing',
+				'page' => 1,
+				'drawing' => $row['id_drawing'],
+			), false),
+		);
+	}
+	db_free_result($request);
+
+	$output = array();
+	foreach ($drawings as $data)
+	{
+		$item = array();
+		foreach ($data as $key => $value)
+			$item[] = $key . '=' . $value;
+		$output[] = implode(',', $item);
+	}
+	$output = implode(";\n", $output);
 
 	exit($output);
 }
