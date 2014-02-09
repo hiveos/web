@@ -23,6 +23,7 @@ require $core['includes_dir'] . '/common.php';
 
 $template = array();
 $user = array();
+$api_user = array();
 
 clean_request();
 db_initiate();
@@ -30,7 +31,7 @@ start_session();
 load_user();
 load_template();
 
-$modules = array('home', 'about');
+$modules = array('home', 'about', 'api');
 if ($user['logged'])
 	$modules = array_merge($modules, array('logout', 'profile', 'mybook', 'mynotebook', 'mydrawing', 'output'));
 else
