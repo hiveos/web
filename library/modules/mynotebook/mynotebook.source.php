@@ -30,20 +30,6 @@ function mynotebook_list()
 {
 	global $core, $template, $user;
 
-	$styles = array(
-		0 => 'Plain',
-		1 => 'Type 1',
-		2 => 'Type 2',
-	);
-
-	$colors = array(
-		0 => 'White',
-		1 => 'Black',
-		2 => 'Red',
-		3 => 'Green',
-		4 => 'Blue',
-	);
-
 	$request = db_query("
 		SELECT id_notebook, name, style, color
 		FROM mynotebook
@@ -55,8 +41,8 @@ function mynotebook_list()
 		$template['notebooks'][] = array(
 			'id' => $row['id_notebook'],
 			'name' => $row['name'],
-			'style' => $styles[$row['style']],
-			'color' => $colors[$row['color']],
+			'style' => $row['style'],
+			'color' => $row['color'],
 		);
 	}
 	db_free_result($request);
@@ -127,6 +113,9 @@ function mynotebook_edit()
 	$id_notebook = !empty($_REQUEST['mynotebook']) ? (int) $_REQUEST['mynotebook'] : 0;
 	$is_new = empty($id_notebook);
 
+	$template['styles'] = array('Lines', 'Grid', 'Plain');
+	$template['colors'] = array('White', 'Gray', 'Blue', 'Dark Blue', 'Purple', 'Dark Purple', 'Green', 'Dark Green', 'Orange', 'Dark Orange', 'Red', 'Dark Red');
+
 	if (!empty($_POST['save']))
 	{
 		check_session('mynotebook');
@@ -134,20 +123,22 @@ function mynotebook_edit()
 		$values = array();
 		$fields = array(
 			'name' => 'string',
-			'style' => 'int',
-			'color' => 'int',
+			'style' => 'string',
+			'color' => 'string',
 		);
 
 		foreach ($fields as $field => $type)
 		{
 			if ($type === 'string')
 				$values[$field] = !empty($_POST[$field]) ? htmlspecialchars($_POST[$field], ENT_QUOTES) : '';
-			elseif ($type === 'int')
-				$values[$field] = !empty($_POST[$field]) ? (int) $_POST[$field] : 0;
 		}
 
 		if ($values['name'] === '')
 			fatal_error('Notebook name field cannot be empty!');
+		elseif (!in_array($values['style'], $template['styles']))
+			fatal_error('Notebook style selected is invalid!');
+		elseif (!in_array($values['color'], $template['colors']))
+			fatal_error('Notebook color selected is invalid!');
 
 		if ($is_new)
 		{
@@ -190,8 +181,8 @@ function mynotebook_edit()
 			'is_new' => true,
 			'id' => 0,
 			'name' => '',
-			'style' => 0,
-			'color' => 0,
+			'style' => '',
+			'color' => '',
 		);
 	}
 	else
@@ -216,20 +207,6 @@ function mynotebook_edit()
 		if (!isset($template['notebook']))
 			fatal_error('The notebook requested does not exist!');
 	}
-
-	$template['styles'] = array(
-		0 => 'Plain',
-		1 => 'Type 1',
-		2 => 'Type 2',
-	);
-
-	$template['colors'] = array(
-		0 => 'White',
-		1 => 'Black',
-		2 => 'Red',
-		3 => 'Green',
-		4 => 'Blue',
-	);
 
 	$template['page_title'] = (!$is_new ? 'Edit' : 'Add') . ' Notebook';
 	$core['current_template'] = 'mynotebook_edit';

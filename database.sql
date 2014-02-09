@@ -81,8 +81,8 @@ CREATE TABLE IF NOT EXISTS `mynotebook` (
   `id_notebook` mediumint(8) NOT NULL AUTO_INCREMENT,
   `id_user` mediumint(8) NOT NULL DEFAULT '0',
   `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
-  `style` tinyint(4) NOT NULL DEFAULT '0',
-  `color` tinyint(4) NOT NULL DEFAULT '0',
+  `style` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+  `color` varchar(255) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
   PRIMARY KEY (`id_notebook`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 
