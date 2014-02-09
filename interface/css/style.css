@@ -88,3 +88,7 @@ hr
 	text-align: center;
 	padding: 1em;
 }
+.content_page img
+{
+	max-width: 800px;
+}

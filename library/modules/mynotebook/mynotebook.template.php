@@ -90,8 +90,22 @@ function template_mynotebook_view()
 			</div>
 			<h2>View Notebook - ', $template['notebook']['name'], ' - Page ', $template['notebook']['page'], ' of ', $template['notebook']['pages'], '</h2>
 		</div>
-		<div class="content_page">
-			<img src="', build_url(array('output', 'notebook', $template['notebook']['page'], $template['notebook']['id'])), '" alt="" class="img-polaroid" />
+		<div class="content_page">';
+
+	if ($template['notebook']['next'])
+	{
+		echo '
+			<a href="', build_url(array('mynotebook', 'view', $template['notebook']['id'], $template['notebook']['page'] + 1)), '">
+				<img src="', build_url(array('output', 'notebook', $template['notebook']['page'], $template['notebook']['id'])), '" alt="" class="img-polaroid" />
+			</a>';
+	}
+	else
+	{
+		echo '
+			<img src="', build_url(array('output', 'notebook', $template['notebook']['page'], $template['notebook']['id'])), '" alt="" class="img-polaroid" />';
+	}
+
+	echo '
 		</div>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			function set_page()

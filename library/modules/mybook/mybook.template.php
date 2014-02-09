@@ -89,8 +89,22 @@ function template_mybook_view()
 			</div>
 			<h2>View Book - ', $template['book']['name'], ' - Page ', $template['book']['page'], ' of ', $template['book']['pages'], '</h2>
 		</div>
-		<div class="content_page">
-			<img src="', build_url(array('output', 'book', $template['book']['page'], $template['book']['id'])), '" alt="" class="img-polaroid" />
+		<div class="content_page">';
+
+	if ($template['book']['next'])
+	{
+		echo '
+			<a href="', build_url(array('mybook', 'view', $template['book']['id'], $template['book']['page'] + 1)), '">
+				<img src="', build_url(array('output', 'book', $template['book']['page'], $template['book']['id'])), '" alt="" class="img-polaroid" />
+			</a>';
+	}
+	else
+	{
+		echo '
+			<img src="', build_url(array('output', 'book', $template['book']['page'], $template['book']['id'])), '" alt="" class="img-polaroid" />';
+	}
+
+	echo '
 		</div>
 		<script type="text/javascript"><!-- // --><![CDATA[
 			function set_page()
