@@ -87,7 +87,7 @@ function profile_main()
 			fatal_error('The email address entered is already in use!');
 
 		$changes = array();
-		if ($values['email_address'] !== $template['email_address'])
+		if ($values['email_address'] !== $template['profile']['email_address'])
 			$changes[] = "email_address = '$values[email_address]'";
 		if ($values['choose_password'] !== '')
 		{
