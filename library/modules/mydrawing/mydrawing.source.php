@@ -17,7 +17,7 @@ function mydrawing_main()
 {
 	global $core;
 
-	$actions = array('list', 'edit', 'delete');
+	$actions = array('list', 'view', 'edit', 'delete');
 
 	$core['current_action'] = 'list';
 	if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $actions))
@@ -47,6 +47,57 @@ function mydrawing_list()
 
 	$template['page_title'] = 'Drawing List';
 	$core['current_template'] = 'mydrawing_list';
+}
+
+function mydrawing_view()
+{
+	global $core, $template, $user;
+
+	$id_drawing = !empty($_REQUEST['mydrawing']) ? (int) $_REQUEST['mydrawing'] : 0;
+	$drawing_dir = $core['storage_dir'] . '/' . $user['ssid'] . '/d' . $id_drawing;
+
+	$request = db_query("
+		SELECT id_drawing, name
+		FROM mydrawing
+		WHERE id_drawing = $id_drawing
+			AND id_user = $user[id]
+		LIMIT 1");
+	while ($row = db_fetch_assoc($request))
+	{
+		$template['drawing'] = array(
+			'id' => $row['id_drawing'],
+			'name' => $row['name'],
+		);
+	}
+	db_free_result($request);
+
+	if (!isset($template['drawing']) || !file_exists($drawing_dir))
+		fatal_error('The drawing requested does not exist!');
+
+	$page = 0;
+
+	if (($handle = opendir($drawing_dir)))
+	{
+		while ($file = readdir($handle))
+		{
+			if (preg_match('~page(\d+).jpg$~', $file, $match))
+			{
+				$page = $match[1];
+
+				break;
+			}
+		}
+
+		closedir($handle);
+	}
+
+	if ($page < 1)
+		fatal_error('There are no pages in the requested drawing!');
+
+	$template['drawing']['page'] = $page;
+
+	$template['page_title'] = 'View Drawing';
+	$core['current_template'] = 'mydrawing_view';
 }
 
 function mydrawing_edit()

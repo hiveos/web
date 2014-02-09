@@ -47,6 +47,7 @@ function template_mydrawing_list()
 				<tr>
 					<td>', $drawing['name'], '</td>
 					<td class="span3 align_center">
+						<a class="btn btn-info" href="', build_url(array('mydrawing', 'view', $drawing['id'])), '">View</a>
 						<a class="btn btn-primary" href="', build_url(array('mydrawing', 'edit', $drawing['id'])), '">Edit</a>
 						<a class="btn btn-danger" href="', build_url(array('mydrawing', 'delete', $drawing['id'])), '">Delete</a>
 					</td>
@@ -56,6 +57,19 @@ function template_mydrawing_list()
 	echo '
 			</tbody>
 		</table>';
+}
+
+function template_mydrawing_view()
+{
+	global $template;
+
+	echo '
+		<div class="page-header">
+			<h2>View Drawing - ', $template['drawing']['name'], '</h2>
+		</div>
+		<div class="content_page">
+			<img src="', build_url(array('output', 'drawing', $template['drawing']['page'], $template['drawing']['id'])), '" alt="" class="img-polaroid" />
+		</div>';
 }
 
 function template_mydrawing_edit()
