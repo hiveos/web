@@ -69,6 +69,7 @@ function api_login()
 		'photo' => get_photo_src($api_user['unique']),
 		'name' => $api_user['name'],
 		'class' => $api_user['class_name'],
+		'ssid' => $api_user['ssid'],
 		'unique' => $api_user['unique'],
 	);
 
