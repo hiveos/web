@@ -131,8 +131,8 @@ function book_edit()
 			if (!is_uploaded_file($_FILES['file']['tmp_name']) || (@ini_get('open_basedir') == '' && !file_exists($_FILES['file']['tmp_name'])))
 				fatal_error('File could not be uploaded!');
 
-			if ($file_size > 1 * 1024 * 1024)
-				fatal_error('Files cannot be larger than 5 MB!');
+			if ($file_size > 10 * 1024 * 1024)
+				fatal_error('Files cannot be larger than 10 MB!');
 
 			if (!in_array($file_extension, array('zip')))
 				fatal_error('Only files with the following extensions can be uploaded: zip');
