@@ -234,8 +234,8 @@ function get_photo_src($unique)
 {
 	global $core;
 
-	$base_dir = $core['site_dir'] . '/interface/img/photo_%s.jpg';
-	$base_src = $core['site_url'] . '/interface/img/photo_%s.jpg';
+	$base_dir = $core['site_dir'] . 'interface/img/photo_%s.jpg';
+	$base_src = $core['site_url'] . 'interface/img/photo_%s.jpg';
 
 	return sprintf($base_src, file_exists(sprintf($base_dir, $unique)) ? $unique : 'default');
 }
