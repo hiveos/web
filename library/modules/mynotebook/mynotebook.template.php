@@ -47,6 +47,7 @@ function template_mynotebook_list()
 				<tr>
 					<td>', $notebook['name'], '</td>
 					<td class="span3 align_center">
+						<a class="btn btn-info" href="', build_url(array('mynotebook', 'view', $notebook['id'])), '">View</a>
 						<a class="btn btn-primary" href="', build_url(array('mynotebook', 'edit', $notebook['id'])), '">Edit</a>
 						<a class="btn btn-danger" href="', build_url(array('mynotebook', 'delete', $notebook['id'])), '">Delete</a>
 					</td>
@@ -56,6 +57,31 @@ function template_mynotebook_list()
 	echo '
 			</tbody>
 		</table>';
+}
+
+function template_mynotebook_view()
+{
+	global $template;
+
+	echo '
+		<div class="page-header">
+			<div class="pull-right">';
+
+	if ($template['notebook']['previous'])
+		echo '
+				<a class="btn" href="', build_url(array('mynotebook', 'view', $template['notebook']['id'], $template['notebook']['page'] - 1)), '">Previous Page</a>';
+
+	if ($template['notebook']['next'])
+		echo '
+				<a class="btn" href="', build_url(array('mynotebook', 'view', $template['notebook']['id'], $template['notebook']['page'] + 1)), '">Next Page</a>';
+
+	echo '
+			</div>
+			<h2>View Notebook - ', $template['notebook']['name'], ' - Page ', $template['notebook']['page'], ' of ', $template['notebook']['pages'], '</h2>
+		</div>
+		<div class="content_page">
+			<img src="', build_url(array('output', 'notebook', $template['notebook']['page'], $template['notebook']['id'])), '" alt="" class="img-polaroid" />
+		</div>';
 }
 
 function template_mynotebook_edit()

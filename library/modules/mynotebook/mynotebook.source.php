@@ -17,7 +17,7 @@ function mynotebook_main()
 {
 	global $core;
 
-	$actions = array('list', 'edit', 'delete');
+	$actions = array('list', 'view', 'edit', 'delete');
 
 	$core['current_action'] = 'list';
 	if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $actions))
@@ -63,6 +63,61 @@ function mynotebook_list()
 
 	$template['page_title'] = 'Notebook List';
 	$core['current_template'] = 'mynotebook_list';
+}
+
+function mynotebook_view()
+{
+	global $core, $template, $user;
+
+	$id_notebook = !empty($_REQUEST['mynotebook']) ? (int) $_REQUEST['mynotebook'] : 0;
+	$page = !empty($_REQUEST['view']) ? (int) $_REQUEST['view'] : 0;
+	$notebook_dir = $core['storage_dir'] . '/' . $user['ssid'] . '/n' . $id_notebook;
+
+	$request = db_query("
+		SELECT id_notebook, name
+		FROM mynotebook
+		WHERE id_notebook = $id_notebook
+			AND id_user = $user[id]
+		LIMIT 1");
+	while ($row = db_fetch_assoc($request))
+	{
+		$template['notebook'] = array(
+			'id' => $row['id_notebook'],
+			'name' => $row['name'],
+		);
+	}
+	db_free_result($request);
+
+	if (!isset($template['notebook']) || !file_exists($notebook_dir))
+		fatal_error('The notebook requested does not exist!');
+
+	$pages = array();
+
+	if (($handle = opendir($notebook_dir)))
+	{
+		while ($file = readdir($handle))
+		{
+			if (preg_match('~page(\d+).jpg$~', $file, $match))
+				$pages[] = $match[1];
+		}
+
+		natsort($pages);
+
+		closedir($handle);
+	}
+
+	if (empty($pages))
+		fatal_error('There are no pages in the requested notebook!');
+	elseif (!in_array($page, $pages))
+		$page = current($pages);
+
+	$template['notebook']['page'] = $page;
+	$template['notebook']['pages'] = count($pages);
+	$template['notebook']['previous'] = $page > 1;
+	$template['notebook']['next'] = $page < count($pages);
+
+	$template['page_title'] = 'View Notebook';
+	$core['current_template'] = 'mynotebook_view';
 }
 
 function mynotebook_edit()
