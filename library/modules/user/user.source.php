@@ -218,6 +218,9 @@ function user_edit()
 				SET " . implode(', ', $update) . "
 				WHERE id_user = $id_user
 				LIMIT 1");
+
+			if ($values['ssid'] != $template['user']['ssid'])
+				rename($core['storage_dir'] . '/' . $template['user']['ssid'], $core['storage_dir'] . '/' . $values['ssid']);
 		}
 
 		if (!empty($_FILES['photo']) && !empty($_FILES['photo']['name']))
