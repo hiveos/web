@@ -47,7 +47,7 @@ function api_main()
 	if (empty($api_user))
 		exit('Sorry, the ID provided is not valid!');
 
-	$actions = array('none', 'login', 'list');
+	$actions = array('none', 'login', 'list', 'delete');
 
 	$core['current_action'] = 'none';
 	if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $actions))
@@ -132,4 +132,44 @@ function api_list()
 	$output = implode(";\n", $output);
 
 	exit($output);
+}
+
+function api_delete()
+{
+	global $api_user;
+
+	if (!empty($_REQUEST['type']) && in_array($_REQUEST['type'], array('book', 'notebook', 'drawing')))
+		$type = $_REQUEST['type'];
+	else
+		exit('Sorry, the type provided is not valid!');
+
+	if (!empty($_POST['item']) && (int) $_POST['item'] > 0)
+		$id_item = (int) $_POST['item'];
+	else
+		exit('Sorry, the item provided is not valid!');
+
+	$types = array(
+		'book' => array('mybook', 'id_book'),
+		'notebook' => array('mynotebook', 'id_notebook'),
+		'drawing' => array('mydrawing', 'id_drawing'),
+	);
+
+	$request = db_query("
+		SELECT {$types[$type][1]}
+		FROM {$types[$type][0]}
+		WHERE id_user = $api_user[id]
+			AND {$types[$type][1]} = $id_item
+		LIMIT 1");
+	list ($id_item) = db_fetch_row($request);
+	db_free_result($request);
+
+	if (empty($id_item))
+		exit('Sorry, the item provided is not valid!');
+
+	db_query("
+		DELETE FROM {$types[$type][0]}
+		WHERE {$types[$type][1]} = $id_item
+		LIMIT 1");
+
+	exit('return=1');
 }
