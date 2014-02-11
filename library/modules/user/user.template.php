@@ -51,7 +51,7 @@ function template_user_list()
 	{
 		echo '
 				<tr>
-					<td class="align_center"><img src="', get_photo_src($user['unique']), '" alt="" class="img-polaroid table_photo" /></td>
+					<td class="align_center"><img src="', get_photo_src($user['unique']), '" alt="" class="img-polaroid web_photo" /></td>
 					<td class="align_center">', $user['ssid'], '</td>
 					<td>', $user['name'], '</td>
 					<td>', $user['email_address'], '</td>
@@ -159,7 +159,7 @@ function template_user_edit()
 				<div class="control-group">
 					<label class="control-label">Current photo:</label>
 					<div class="controls">
-						<img src="', get_photo_src($template['user']['unique']), '" alt="" class="img-polaroid" />
+						<img src="', get_photo_src($template['user']['unique']), '" alt="" class="img-polaroid web_photo" />
 					</div>
 				</div>
 				<div class="control-group">
