@@ -1,4 +1,5 @@
 RewriteEngine on
+RewriteRule ^api/([a-f0-9]{20})/([a-z]+)/([a-z]+)/?$ ?module=api&unique=$1&action=$2&type=$3
 RewriteRule ^api/([a-f0-9]{20})/([a-z]+)/?$ ?module=api&unique=$1&action=$2
 RewriteRule ^([a-z]+)/?$ ?module=$1
 RewriteRule ^([a-z]+)/([a-z]+)/?$ ?module=$1&action=$2
