@@ -47,7 +47,7 @@ function api_main()
 	if (empty($api_user))
 		exit('Sorry, the ID provided is not valid!');
 
-	$actions = array('none', 'login', 'list', 'delete');
+	$actions = array('none', 'login', 'list', 'add', 'edit', 'delete');
 
 	$core['current_action'] = 'none';
 	if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $actions))
@@ -132,6 +132,203 @@ function api_list()
 	$output = implode(";\n", $output);
 
 	exit($output);
+}
+
+function api_add()
+{
+	global $core, $api_user;
+
+	if (!empty($_REQUEST['type']) && in_array($_REQUEST['type'], array('book', 'notebook', 'drawing')))
+		$type = $_REQUEST['type'];
+	else
+		exit('Sorry, the type provided is not valid!');
+
+	if ($type == 'book')
+	{
+		if (!empty($_POST['id_book']) && (int) $_POST['id_book'] > 0)
+			$id_parent = (int) $_POST['id_book'];
+		else
+			exit('Sorry, the book id provided is not valid!');
+
+		$request = db_query("
+			SELECT id_book, name
+			FROM book
+			WHERE id_book = $id_parent
+				AND FIND_IN_SET($api_user[id_class], class)
+			LIMIT 1");
+		list ($id_parent, $name) = db_fetch_row($request);
+		db_free_result($request);
+
+		if (empty($id_parent))
+			exit('Sorry, the item provided is not valid!');
+
+		$insert = array(
+			'name' => "'" . $name . "'",
+			'id_user' => $api_user['id'],
+		);
+
+		db_query("
+			INSERT INTO mybook
+				(" . implode(', ', array_keys($insert)) . ")
+			VALUES
+				(" . implode(', ', $insert) . ")");
+
+		$id_book = db_insert_id();
+
+		$book_dir = $core['storage_dir'] . '/' . $api_user['ssid'] . '/b' . $id_book;
+		$parent_dir = $core['storage_dir'] . '/shared/' . $id_parent;
+
+		mkdir($book_dir);
+
+		if (($handle = opendir($parent_dir)))
+		{
+			while ($file = readdir($handle))
+			{
+				if (in_array($file, array('.', '..')))
+					continue;
+
+				if (is_file($parent_dir . '/' . $file))
+					copy($parent_dir . '/' . $file, $book_dir . '/' . $file);
+			}
+
+			closedir($handle);
+		}
+	}
+	elseif ($type == 'notebook')
+	{
+		$values = array();
+		$fields = array('name', 'style', 'color');
+
+		foreach ($fields as $field)
+			$values[$field] = !empty($_POST[$field]) ? htmlspecialchars($_POST[$field], ENT_QUOTES) : '';
+
+		$styles = array('Lines', 'Grid', 'Plain');
+		$colors = array('White', 'Gray', 'Blue', 'Dark Blue', 'Purple', 'Dark Purple', 'Green', 'Dark Green', 'Orange', 'Dark Orange', 'Red', 'Dark Red');
+
+		if ($values['name'] === '')
+			exit('Sorry, the name field provided is not valid!');
+		elseif (!in_array($values['style'], $styles))
+			exit('Sorry, the style field provided is not valid!');
+		elseif (!in_array($values['color'], $colors))
+			exit('Sorry, the color field provided is not valid!');
+
+		$insert = array(
+			'id_user' => $api_user['id'],
+		);
+		foreach ($values as $field => $value)
+			$insert[$field] = "'" . $value . "'";
+
+		db_query("
+			INSERT INTO mynotebook
+				(" . implode(', ', array_keys($insert)) . ")
+			VALUES
+				(" . implode(', ', $insert) . ")");
+
+		$id_notebook = db_insert_id();
+
+		mkdir($core['storage_dir'] . '/' . $api_user['ssid'] . '/n' . $id_notebook);
+	}
+	elseif ($type == 'drawing')
+	{
+		$values = array();
+		$fields = array('name');
+
+		foreach ($fields as $field)
+			$values[$field] = !empty($_POST[$field]) ? htmlspecialchars($_POST[$field], ENT_QUOTES) : '';
+
+		if ($values['name'] === '')
+			exit('Sorry, the name field provided is not valid!');
+
+		$insert = array(
+			'id_user' => $api_user['id'],
+		);
+		foreach ($values as $field => $value)
+			$insert[$field] = "'" . $value . "'";
+
+		db_query("
+			INSERT INTO mydrawing
+				(" . implode(', ', array_keys($insert)) . ")
+			VALUES
+				(" . implode(', ', $insert) . ")");
+
+		$id_drawing = db_insert_id();
+
+		mkdir($core['storage_dir'] . '/' . $api_user['ssid'] . '/d' . $id_drawing);
+	}
+
+	exit('return=1');
+}
+
+function api_edit()
+{
+	global $api_user;
+
+	if (!empty($_REQUEST['type']) && in_array($_REQUEST['type'], array('notebook', 'drawing')))
+		$type = $_REQUEST['type'];
+	else
+		exit('Sorry, the type provided is not valid!');
+
+	if (!empty($_POST['item']) && (int) $_POST['item'] > 0)
+		$id_item = (int) $_POST['item'];
+	else
+		exit('Sorry, the item provided is not valid!');
+
+	$types = array(
+		'notebook' => array('mynotebook', 'id_notebook'),
+		'drawing' => array('mydrawing', 'id_drawing'),
+	);
+
+	$request = db_query("
+		SELECT {$types[$type][1]}
+		FROM {$types[$type][0]}
+		WHERE id_user = $api_user[id]
+			AND {$types[$type][1]} = $id_item
+		LIMIT 1");
+	list ($id_item) = db_fetch_row($request);
+	db_free_result($request);
+
+	if (empty($id_item))
+		exit('Sorry, the item provided is not valid!');
+
+	$values = array();
+	$fields = array('name');
+
+	if ($type == 'notebook')
+	{
+		$fields[] = 'style';
+		$fields[] = 'color';
+	}
+
+	foreach ($fields as $field)
+	{
+		$values[$field] = !empty($_POST[$field]) ? htmlspecialchars($_POST[$field], ENT_QUOTES) : '';
+
+		if ($values[$field] === '')
+			exit('Sorry, the ' . $field .' field provided is not valid!');
+	}
+
+	if ($type == 'notebook')
+	{
+		$styles = array('Lines', 'Grid', 'Plain');
+		$colors = array('White', 'Gray', 'Blue', 'Dark Blue', 'Purple', 'Dark Purple', 'Green', 'Dark Green', 'Orange', 'Dark Orange', 'Red', 'Dark Red');
+
+		if (!in_array($values['style'], $styles))
+			exit('Sorry, the style field provided is not valid!');
+		elseif (!in_array($values['color'], $colors))
+			exit('Sorry, the color field provided is not valid!');
+	}
+
+	$update = array();
+	foreach ($values as $field => $value)
+		$update[] = $field . " = '" . $value . "'";
+
+	db_query("
+		UPDATE {$types[$type][0]}
+		SET " . implode(', ', $update) . "
+		WHERE {$types[$type][1]} = $id_item
+		LIMIT 1");
+
+	exit('return=1');
 }
 
 function api_delete()
