@@ -17,7 +17,7 @@ function user_main()
 {
 	global $core;
 
-	$actions = array('list', 'edit', 'delete');
+	$actions = array('list', 'edit', 'reset', 'delete');
 
 	$core['current_action'] = 'list';
 	if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $actions))
@@ -264,6 +264,67 @@ function user_edit()
 
 	$template['page_title'] = (!$is_new ? 'Edit' : 'Add') . ' User';
 	$core['current_template'] = 'user_edit';
+}
+
+function user_reset()
+{
+	global $core, $template;
+
+	$id_user = !empty($_REQUEST['user']) ? (int) $_REQUEST['user'] : 0;
+
+	$request = db_query("
+		SELECT id_user, id_unique, name
+		FROM user
+		WHERE id_user = $id_user
+		LIMIT 1");
+	while ($row = db_fetch_assoc($request))
+	{
+		$unique = $row['id_unique'];
+
+		$template['user'] = array(
+			'id' => $row['id_user'],
+			'name' => $row['name'],
+		);
+	}
+	db_free_result($request);
+
+	if (!isset($template['user']))
+		fatal_error('The user requested does not exist!');
+
+	if (!empty($_POST['reset']))
+	{
+		check_session('user');
+
+		$new_unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 20);
+
+		$request = db_query("
+			SELECT id_user
+			FROM user
+			WHERE id_unique = '$new_unique'
+			LIMIT 1");
+		list ($duplicate_id) = db_fetch_row($request);
+		db_free_result($request);
+
+		if (!empty($duplicate_id))
+			$new_unique = substr(md5(session_id() . mt_rand() . (string) microtime()), 0, 20);
+
+		db_query("
+			UPDATE user
+			SET id_unique = '$new_unique'
+			WHERE id_user = $id_user
+			LIMIT 1");
+
+		$base_photo_dir = $core['site_dir'] . '/interface/img/photo_%s.png';
+
+		if (file_exists(sprintf($base_photo_dir, $unique)))
+			rename(sprintf($base_photo_dir, $unique), sprintf($base_photo_dir, $new_unique));
+	}
+
+	if (!empty($_POST['reset']) || !empty($_POST['cancel']))
+		redirect(build_url('user'));
+
+	$template['page_title'] = 'Reset User Unique ID';
+	$core['current_template'] = 'user_reset';
 }
 
 function user_delete()

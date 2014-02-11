@@ -59,6 +59,7 @@ function template_user_list()
 					<td class="span2 align_center">', $user['registered'], '</td>
 					<td class="align_center">', $user['admin'], '</td>
 					<td class="span3 align_center">
+						<a class="btn btn-warning" href="', build_url(array('user', 'reset', $user['id'])), '">Reset UID</a>
 						<a class="btn btn-primary" href="', build_url(array('user', 'edit', $user['id'])), '">Edit</a>
 						<a class="btn btn-danger" href="', build_url(array('user', 'delete', $user['id'])), '">Delete</a>
 					</td>
@@ -185,6 +186,25 @@ function template_user_edit()
 	echo '
 				<div class="form-actions">
 					<input type="submit" class="btn btn-primary" name="save" value="Save changes" />
+					<input type="submit" class="btn" name="cancel" value="Cancel" />
+				</div>
+			</fieldset>
+			<input type="hidden" name="user" value="', $template['user']['id'], '" />
+			<input type="hidden" name="session_id" value="', $user['session_id'], '" />
+		</form>';
+}
+
+function template_user_reset()
+{
+	global $user, $template;
+
+	echo '
+		<form class="form-horizontal" action="', build_url(array('user', 'reset')), '" method="post">
+			<fieldset>
+				<legend>Reset User Unique ID</legend>
+				Are you sure you want to reset the unique ID of the user &quot;', $template['user']['name'], '&quot;?
+				<div class="form-actions">
+					<input type="submit" class="btn btn-danger" name="reset" value="Reset" />
 					<input type="submit" class="btn" name="cancel" value="Cancel" />
 				</div>
 			</fieldset>
