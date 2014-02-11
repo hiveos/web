@@ -80,7 +80,7 @@ function mydrawing_view()
 	{
 		while ($file = readdir($handle))
 		{
-			if (preg_match('~page(\d+).jpg$~', $file, $match))
+			if (preg_match('~page(\d+).png$~', $file, $match))
 			{
 				$page = $match[1];
 

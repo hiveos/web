@@ -32,12 +32,12 @@ function output_main()
 	$page = !empty($_REQUEST['output']) ? (int) $_REQUEST['output'] : 0;
 	$item = !empty($_REQUEST[$current_action]) ? (int) $_REQUEST[$current_action] : 0;
 
-	$file_dir = $core['storage_dir'] . '/' . $user['ssid'] . '/' . $type . $item . '/page' . $page . '.jpg';
+	$file_dir = $core['storage_dir'] . '/' . $user['ssid'] . '/' . $type . $item . '/page' . $page . '.png';
 
 	if (!file_exists($file_dir))
 		exit();
 
-	header('Content-Type: image/jpeg');
+	header('Content-Type: image/png');
 	readfile($file_dir);
 
 	exit();

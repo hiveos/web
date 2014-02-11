@@ -51,7 +51,7 @@ function template_user_list()
 	{
 		echo '
 				<tr>
-					<td class="align_center"><img src="', get_photo_src($user['unique']), '" alt="" class="img-polaroid" /></td>
+					<td class="align_center"><img src="', get_photo_src($user['unique']), '" alt="" class="img-polaroid table_photo" /></td>
 					<td class="align_center">', $user['ssid'], '</td>
 					<td>', $user['name'], '</td>
 					<td>', $user['email_address'], '</td>

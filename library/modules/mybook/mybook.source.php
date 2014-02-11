@@ -81,7 +81,7 @@ function mybook_view()
 	{
 		while ($file = readdir($handle))
 		{
-			if (preg_match('~page(\d+).jpg$~', $file, $match))
+			if (preg_match('~page(\d+).png$~', $file, $match))
 				$pages[] = $match[1];
 		}
 

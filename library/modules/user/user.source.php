@@ -235,8 +235,8 @@ function user_edit()
 			if ($photo_size > 1 * 1024 * 1024)
 				fatal_error('Photo cannot be larger than 1 MB!');
 
-			if (!in_array($photo_extension, array('jpg')))
-				fatal_error('Only photos with the following extensions can be uploaded: jpg');
+			if (!in_array($photo_extension, array('png')))
+				fatal_error('Only photos with the following extensions can be uploaded: png');
 
 			@unlink($photo_dir);
 
