@@ -47,7 +47,7 @@ function api_main()
 	if (empty($api_user))
 		exit('Sorry, the ID provided is not valid!');
 
-	$actions = array('none', 'login', 'list', 'add', 'edit', 'delete', 'output');
+	$actions = array('none', 'login', 'list', 'add', 'edit', 'delete', 'output', 'pull');
 
 	$core['current_action'] = 'none';
 	if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $actions))
@@ -374,6 +374,60 @@ function api_output()
 
 	header('Content-Type: image/png');
 	readfile($file_dir);
+
+	exit();
+}
+
+function api_pull()
+{
+	global $core, $api_user;
+
+	if (!empty($_REQUEST['type']) && in_array($_REQUEST['type'], array('book', 'notebook', 'drawing')))
+		$type = $_REQUEST['type'];
+	else
+		exit('Sorry, the type provided is not valid!');
+
+	if (!empty($_POST['item']) && (int) $_POST['item'] > 0)
+		$item = (int) $_POST['item'];
+	else
+		exit('Sorry, the item provided is not valid!');
+
+	$item_dir = $core['storage_dir'] . '/' . $api_user['ssid'] . '/' . $type[0] . $item . '/';
+	$pack_dir = $core['storage_dir'] . '/shared/temp_' . $api_user['ssid'] . '_' . $type[0] . $item . '.zip';
+
+	if (!file_exists($item_dir))
+		exit('Sorry, the item provided is not valid!');
+
+	if (file_exists($pack_dir))
+		unlink($pack_dir);
+
+	$request = db_query("
+		SELECT name
+		FROM my{$type}
+		WHERE id_user = $api_user[id]
+			AND id_{$type} = $item
+		LIMIT 1");
+	list ($name) = db_fetch_row($request);
+	db_free_result($request);
+
+	compress_pack($item_dir, $pack_dir, $name . '/');
+
+	if (!file_exists($pack_dir))
+		fatal_error('Package does not exist!');
+
+	header('Content-Description: File Transfer');
+	header('Content-Type: application/octet-stream');
+	header('Content-Disposition: attachment; filename="' . $name . '.zip"');
+	header('Content-Transfer-Encoding: binary');
+	header('Expires: 0');
+	header('Cache-Control: must-revalidate');
+	header('Pragma: public');
+	header('Content-Length: ' . filesize($pack_dir));
+
+	ob_clean();
+	flush();
+	readfile($pack_dir);
+	unlink($pack_dir);
 
 	exit();
 }
