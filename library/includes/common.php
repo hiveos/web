@@ -296,13 +296,13 @@ function extract_pack($input, $output)
 	}
 }
 
-function compress_pack($input, $output)
+function compress_pack($input, $output, $enclose = '')
 {
 	$handle = new ZipArchive;
 
 	if ($handle->open($output, ZipArchive::CREATE) === true)
 	{
-		compress_pack_recursive($input, $handle);
+		compress_pack_recursive($input, $handle, $enclose);
 
 		$handle->close();
 	}
@@ -321,7 +321,7 @@ function compress_pack_recursive($dir, $handle, $current = '')
 			{
 				if (!is_file($dir . $file))
 				{
-					if ($file[0] === '.')
+					if ($file[0] !== '.')
 						compress_pack_recursive($dir . $file . '/', $handle, $current . $file . '/');
 				}
 				else
