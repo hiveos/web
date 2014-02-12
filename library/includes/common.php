@@ -212,6 +212,55 @@ function clean_request()
 	$_REQUEST = $_POST + $_GET;
 }
 
+function extract_pack($input, $output)
+{
+	$handle = new ZipArchive;
+
+	if ($handle->open($input) === true)
+	{
+		$handle->extractTo($output);
+
+		$handle->close();
+	}
+}
+
+function compress_pack($input, $output)
+{
+	$handle = new ZipArchive;
+
+	if ($handle->open($output, ZipArchive::CREATE) === true)
+	{
+		compress_pack_recursive($input, $handle);
+
+		$handle->close();
+	}
+}
+
+function compress_pack_recursive($dir, $handle, $current = '')
+{
+	if (is_dir($dir))
+	{
+		if ($dir_handle = opendir($dir))
+		{
+			if (!empty($current))
+				$handle->addEmptyDir($current);
+
+			while (($file = readdir($dir_handle)) !== false)
+			{
+				if (!is_file($dir . $file))
+				{
+					if (($file !== '.') && ($file !== '..'))
+						compress_pack_recursive($dir . $file . '/', $handle, $current . $file . '/');
+				}
+				else
+					$handle->addFile($dir . $file, $current . $file);
+			}
+
+			closedir($dir_handle);
+		}
+	}
+}
+
 function format_time($stamp, $format = 'short')
 {
 	global $core;
