@@ -47,7 +47,7 @@ function api_main()
 	if (empty($api_user))
 		exit('Sorry, the ID provided is not valid!');
 
-	$actions = array('none', 'login', 'list', 'add', 'edit', 'delete');
+	$actions = array('none', 'login', 'list', 'add', 'edit', 'delete', 'output');
 
 	$core['current_action'] = 'none';
 	if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $actions))
@@ -109,15 +109,6 @@ function api_list()
 
 		foreach ($types[$type][2] as $field)
 			$data[$row[$types[$type][1]]][$field] = $row[$field];
-
-		$data[$row[$types[$type][1]]]['cover'] = build_url(array(
-			'module' => 'api',
-			'unique' => $api_user['unique'],
-			'action' => 'output',
-			'type' => $type,
-			'page' => 1,
-			'item' => $row[$types[$type][1]],
-		), false);
 	}
 	db_free_result($request);
 
@@ -369,4 +360,34 @@ function api_delete()
 		LIMIT 1");
 
 	exit('return=1');
+}
+
+function api_output()
+{
+	global $core, $api_user;
+
+	if (!empty($_REQUEST['type']) && in_array($_REQUEST['type'], array('book', 'notebook', 'drawing')))
+		$type = $_REQUEST['type'];
+	else
+		exit('Sorry, the type provided is not valid!');
+
+	if (!empty($_POST['item']) && (int) $_POST['item'] > 0)
+		$item = (int) $_POST['item'];
+	else
+		exit('Sorry, the item provided is not valid!');
+
+	if (!empty($_POST['page']) && (int) $_POST['page'] > 0)
+		$page = (int) $_POST['page'];
+	else
+		exit('Sorry, the page provided is not valid!');
+
+	$file_dir = $core['storage_dir'] . '/' . $api_user['ssid'] . '/' . $type[0] . $item . '/page' . $page . '.png';
+
+	if (!file_exists($file_dir))
+		exit('Sorry, the page provided is not valid!');
+
+	header('Content-Type: image/png');
+	readfile($file_dir);
+
+	exit();
 }
