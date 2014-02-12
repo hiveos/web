@@ -80,9 +80,9 @@ function mynotebook_view()
 	$pages = array();
 	$temp = list_dir($notebook_dir);
 
-	foreach ($notebook_dir as $file)
+	foreach ($temp as $file)
 	{
-		if (preg_match('~page(\d+).png$~', $file, $match))
+		if (preg_match('~^page(\d+).png$~', $file, $match))
 			$pages[] = $match[1];
 	}
 

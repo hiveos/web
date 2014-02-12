@@ -77,9 +77,9 @@ function mydrawing_view()
 	$page = 0;
 	$temp = list_dir($drawing_dir);
 
-	foreach ($drawing_dir as $file)
+	foreach ($temp as $file)
 	{
-		if (preg_match('~page(\d+).png$~', $file, $match))
+		if (preg_match('~^page(\d+).png$~', $file, $match))
 		{
 			$page = $match[1];
 
