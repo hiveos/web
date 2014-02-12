@@ -47,7 +47,7 @@ function api_main()
 	if (empty($api_user))
 		exit('Sorry, the ID provided is not valid!');
 
-	$actions = array('none', 'login', 'list', 'add', 'edit', 'delete', 'output', 'pull');
+	$actions = array('none', 'login', 'list', 'add', 'edit', 'delete', 'output', 'pull', 'push');
 
 	$core['current_action'] = 'none';
 	if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $actions))
@@ -393,7 +393,7 @@ function api_pull()
 		exit('Sorry, the item provided is not valid!');
 
 	$item_dir = $core['storage_dir'] . '/' . $api_user['ssid'] . '/' . $type[0] . $item . '/';
-	$pack_dir = $core['storage_dir'] . '/shared/temp_' . $api_user['ssid'] . '_' . $type[0] . $item . '.zip';
+	$pack_dir = $core['storage_dir'] . '/shared/temp_d_' . $api_user['ssid'] . '_' . $type[0] . $item . '.zip';
 
 	if (!file_exists($item_dir))
 		exit('Sorry, the item provided is not valid!');
@@ -428,6 +428,55 @@ function api_pull()
 	flush();
 	readfile($pack_dir);
 	unlink($pack_dir);
+
+	exit();
+}
+
+function api_push()
+{
+	global $core, $api_user;
+
+	if (!empty($_REQUEST['type']) && in_array($_REQUEST['type'], array('book', 'notebook', 'drawing')))
+		$type = $_REQUEST['type'];
+	else
+		exit('Sorry, the type provided is not valid!');
+
+	if (!empty($_POST['item']) && (int) $_POST['item'] > 0)
+		$item = (int) $_POST['item'];
+	else
+		exit('Sorry, the item provided is not valid!');
+
+	if (empty($_FILES['file']) || empty($_FILES['file']['name']))
+		exit('Sorry, the file provided is not valid!');
+
+	$target_dir = $core['storage_dir'] . '/' . $api_user['ssid'] . '/' . $type[0] . $item . '/';
+
+	$file_size = (int) $_FILES['file']['size'];
+	$file_extension = htmlspecialchars(strtolower(substr(strrchr($_FILES['file']['name'], '.'), 1)), ENT_QUOTES);
+	$file_dir = $core['storage_dir'] . '/shared/temp_u_' . $api_user['ssid'] . '_' . $type[0] . $item . '.zip';
+
+	if (!is_uploaded_file($_FILES['file']['tmp_name']) || (@ini_get('open_basedir') == '' && !file_exists($_FILES['file']['tmp_name'])))
+		exit('File could not be uploaded!');
+
+	if ($file_size > 20 * 1024 * 1024)
+		exit('Files cannot be larger than 20 MB!');
+
+	if (!in_array($file_extension, array('zip')))
+		exit('Only files with the following extensions can be uploaded: zip');
+
+	if (file_exists($file_dir))
+		unlink($file_dir);
+
+	if (!move_uploaded_file($_FILES['file']['tmp_name'], $file_dir))
+		exit('File could not be uploaded!');
+
+	remove_dir($target_dir);
+
+	mkdir($target_dir);
+
+	extract_pack($file_dir, $target_dir);
+
+	unlink($file_dir);
 
 	exit();
 }
