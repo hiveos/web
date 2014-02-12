@@ -410,7 +410,7 @@ function api_pull()
 	list ($name) = db_fetch_row($request);
 	db_free_result($request);
 
-	compress_pack($item_dir, $pack_dir, $name . '/');
+	compress_pack($item_dir, $pack_dir);
 
 	if (!file_exists($pack_dir))
 		fatal_error('Package does not exist!');
