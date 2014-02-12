@@ -212,6 +212,78 @@ function clean_request()
 	$_REQUEST = $_POST + $_GET;
 }
 
+function create_dir($dir)
+{
+	mkdir($dir);
+}
+
+function remove_dir($dir)
+{
+	if ($current_dir = opendir($dir))
+	{
+		while ($file = readdir($current_dir))
+		{
+			if (in_array($file, array('.', '..')))
+				continue;
+
+			if (is_dir($dir . '/' . $file))
+				remove_dir($dir . '/' . $file);
+			else
+				unlink($dir . '/' . $file);
+		}
+		closedir($current_dir);
+	}
+
+	rmdir($dir);
+}
+
+function list_dir($dir, $sub_dir = '')
+{
+	$data = array();
+
+	if ($handle = @dir($dir . $sub_dir))
+	{
+		while ($file = $handle->read())
+		{
+			if ($file[0] === '.')
+				continue;
+
+			if (is_dir($dir . $sub_dir . '/' . $file))
+				$data = array_merge($data, list_dir($dir, $sub_dir . '/' . $file));
+			else
+				$data[] = $sub_dir == '' ? $file : $sub_dir . '/' . $file;
+		}
+
+		$handle->close();
+	}
+	else
+		return array();
+
+	return $data;
+}
+
+function copy_dir($input, $output)
+{
+	if (!file_exists($output))
+		create_dir($output);
+
+	if ($current_dir = opendir($input))
+	{
+		while ($file = readdir($current_dir))
+		{
+			if ($file[0] === '.')
+				continue;
+
+			if (is_dir($input . '/' . $file))
+				copy_dir($input . '/' . $file, $output . '/' . $file);
+			else
+				copy($input . '/' . $file, $output . '/' . $file);
+		}
+
+		closedir($current_dir);
+	}
+}
+
 function extract_pack($input, $output)
 {
 	$handle = new ZipArchive;
@@ -249,7 +321,7 @@ function compress_pack_recursive($dir, $handle, $current = '')
 			{
 				if (!is_file($dir . $file))
 				{
-					if (($file !== '.') && ($file !== '..'))
+					if ($file[0] === '.')
 						compress_pack_recursive($dir . $file . '/', $handle, $current . $file . '/');
 				}
 				else
