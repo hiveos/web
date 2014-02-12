@@ -76,19 +76,15 @@ function mybook_view()
 		fatal_error('The book requested does not exist!');
 
 	$pages = array();
+	$temp = list_dir($book_dir);
 
-	if (($handle = opendir($book_dir)))
+	foreach ($book_dir as $file)
 	{
-		while ($file = readdir($handle))
-		{
-			if (preg_match('~page(\d+).png$~', $file, $match))
-				$pages[] = $match[1];
-		}
-
-		natsort($pages);
-
-		closedir($handle);
+		if (preg_match('~page(\d+).png$~', $file, $match))
+			$pages[] = $match[1];
 	}
+
+	natsort($pages);
 
 	if (empty($pages))
 		fatal_error('There are no pages in the requested book!');
@@ -169,21 +165,7 @@ function mybook_add()
 		$book_dir = $core['storage_dir'] . '/' . $user['ssid'] . '/b' . $id_book;
 		$parent_dir = $core['storage_dir'] . '/shared/' . $id_parent;
 
-		mkdir($book_dir);
-
-		if (($handle = opendir($parent_dir)))
-		{
-			while ($file = readdir($handle))
-			{
-				if (in_array($file, array('.', '..')))
-					continue;
-
-				if (is_file($parent_dir . '/' . $file))
-					copy($parent_dir . '/' . $file, $book_dir . '/' . $file);
-			}
-
-			closedir($handle);
-		}
+		copy_dir($parent_dir, $book_dir);
 	}
 
 	if (!empty($_POST['save']) || !empty($_POST['cancel']))

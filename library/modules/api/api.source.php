@@ -169,21 +169,7 @@ function api_add()
 		$book_dir = $core['storage_dir'] . '/' . $api_user['ssid'] . '/b' . $id_book;
 		$parent_dir = $core['storage_dir'] . '/shared/' . $id_parent;
 
-		mkdir($book_dir);
-
-		if (($handle = opendir($parent_dir)))
-		{
-			while ($file = readdir($handle))
-			{
-				if (in_array($file, array('.', '..')))
-					continue;
-
-				if (is_file($parent_dir . '/' . $file))
-					copy($parent_dir . '/' . $file, $book_dir . '/' . $file);
-			}
-
-			closedir($handle);
-		}
+		copy_dir($parent_dir, $book_dir);
 	}
 	elseif ($type == 'notebook')
 	{

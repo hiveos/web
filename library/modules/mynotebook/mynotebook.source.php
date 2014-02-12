@@ -78,19 +78,15 @@ function mynotebook_view()
 		fatal_error('The notebook requested does not exist!');
 
 	$pages = array();
+	$temp = list_dir($notebook_dir);
 
-	if (($handle = opendir($notebook_dir)))
+	foreach ($notebook_dir as $file)
 	{
-		while ($file = readdir($handle))
-		{
-			if (preg_match('~page(\d+).png$~', $file, $match))
-				$pages[] = $match[1];
-		}
-
-		natsort($pages);
-
-		closedir($handle);
+		if (preg_match('~page(\d+).png$~', $file, $match))
+			$pages[] = $match[1];
 	}
+
+	natsort($pages);
 
 	if (empty($pages))
 		fatal_error('There are no pages in the requested notebook!');

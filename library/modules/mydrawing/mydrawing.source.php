@@ -75,20 +75,16 @@ function mydrawing_view()
 		fatal_error('The drawing requested does not exist!');
 
 	$page = 0;
+	$temp = list_dir($drawing_dir);
 
-	if (($handle = opendir($drawing_dir)))
+	foreach ($drawing_dir as $file)
 	{
-		while ($file = readdir($handle))
+		if (preg_match('~page(\d+).png$~', $file, $match))
 		{
-			if (preg_match('~page(\d+).png$~', $file, $match))
-			{
-				$page = $match[1];
+			$page = $match[1];
 
-				break;
-			}
+			break;
 		}
-
-		closedir($handle);
 	}
 
 	if ($page < 1)

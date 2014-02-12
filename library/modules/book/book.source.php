@@ -142,14 +142,7 @@ function book_edit()
 			if (!move_uploaded_file($_FILES['file']['tmp_name'], $file_dir))
 				fatal_error('File could not be uploaded!');
 
-			$pack = new ZipArchive;
-			if ($pack->open($file_dir) === true)
-			{
-				$pack->extractTo(dirname($file_dir));
-				$pack->close();
-			}
-			else
-				fatal_error('File could not be extracted!');
+			extract_pack($file_dir, dirname($file_dir));
 		}
 	}
 
