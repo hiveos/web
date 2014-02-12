@@ -441,8 +441,8 @@ function api_push()
 	else
 		exit('Sorry, the type provided is not valid!');
 
-	if (!empty($_POST['item']) && (int) $_POST['item'] > 0)
-		$item = (int) $_POST['item'];
+	if (!empty($_REQUEST['item']) && (int) $_REQUEST['item'] > 0)
+		$item = (int) $_REQUEST['item'];
 	else
 		exit('Sorry, the item provided is not valid!');
 
@@ -478,5 +478,5 @@ function api_push()
 
 	unlink($file_dir);
 
-	exit();
+	exit('success=1');
 }
