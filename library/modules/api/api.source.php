@@ -47,7 +47,7 @@ function api_main()
 	if (empty($api_user))
 		exit('Sorry, the ID provided is not valid!');
 
-	$actions = array('none', 'login', 'list', 'add', 'edit', 'delete', 'output', 'pull', 'push');
+	$actions = array('none', 'login', 'list', 'select', 'add', 'edit', 'delete', 'output', 'pull', 'push');
 
 	$core['current_action'] = 'none';
 	if (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $actions))
@@ -101,6 +101,47 @@ function api_list()
 		SELECT {$types[$type][1]}, " . implode(', ', $types[$type][2]) . "
 		FROM {$types[$type][0]}
 		WHERE id_user = $api_user[id]
+		ORDER BY name");
+	$data = array();
+	while ($row = db_fetch_assoc($request))
+	{
+		$data[$row[$types[$type][1]]]['id'] = $row[$types[$type][1]];
+
+		foreach ($types[$type][2] as $field)
+			$data[$row[$types[$type][1]]][$field] = $row[$field];
+	}
+	db_free_result($request);
+
+	$output = array();
+	foreach ($data as $set)
+	{
+		$item = array();
+		foreach ($set as $key => $value)
+			$item[] = $key . '=' . $value;
+		$output[] = implode(',', $item);
+	}
+	$output = implode(";\n", $output);
+
+	exit($output);
+}
+
+function api_select()
+{
+	global $api_user;
+
+	if (!empty($_REQUEST['type']) && in_array($_REQUEST['type'], array('book')))
+		$type = $_REQUEST['type'];
+	else
+		exit('Sorry, the type provided is not valid!');
+
+	$types = array(
+		'book' => array('book', 'id_book', array('name')),
+	);
+
+	$request = db_query("
+		SELECT {$types[$type][1]}, " . implode(', ', $types[$type][2]) . "
+		FROM {$types[$type][0]}
+		WHERE FIND_IN_SET($api_user[id_class], class)
 		ORDER BY name");
 	$data = array();
 	while ($row = db_fetch_assoc($request))
