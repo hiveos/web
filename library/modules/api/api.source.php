@@ -449,6 +449,30 @@ function api_push()
 	if (empty($_FILES['file']) || empty($_FILES['file']['name']))
 		exit('Sorry, the file provided is not valid!');
 
+	if ($type == 'drawing')
+	{
+		$file_size = (int) $_FILES['file']['size'];
+		$file_extension = htmlspecialchars(strtolower(substr(strrchr($_FILES['file']['name'], '.'), 1)), ENT_QUOTES);
+		$file_dir = $core['storage_dir'] . '/' . $api_user['ssid'] . '/' . $type[0] . $item . '/page1.png';
+
+		if (!is_uploaded_file($_FILES['file']['tmp_name']) || (@ini_get('open_basedir') == '' && !file_exists($_FILES['file']['tmp_name'])))
+			exit('File could not be uploaded!');
+
+		if ($file_size > 10 * 1024 * 1024)
+			exit('Files cannot be larger than 10 MB!');
+
+		if (!in_array($file_extension, array('png')))
+			exit('Only files with the following extensions can be uploaded: png');
+
+		if (file_exists($file_dir))
+			unlink($file_dir);
+
+		if (!move_uploaded_file($_FILES['file']['tmp_name'], $file_dir))
+			exit('File could not be uploaded!');
+
+		exit();
+	}
+
 	$target_dir = $core['storage_dir'] . '/' . $api_user['ssid'] . '/' . $type[0] . $item . '/';
 
 	$file_size = (int) $_FILES['file']['size'];
