@@ -15,14 +15,17 @@ if (!defined('CORE'))
 
 function template_home_main()
 {
-	global $core, $template;
+	global $core, $user, $template;
 
 	echo '
 		<div class="page-header">
-			<div class="pull-right">
-				x users &bull; x something
-			</div>
-			<h2>', $core['title_long'], '</h2>
-		</div>
-		<p>Nothing to see here...</p>';
+			<h2>Welcome!</h2>
+		</div>';
+
+if ($user['logged'])
+echo '
+		<p class="well">You can access all your books, notebooks and drawings here. Thank you for learning with HIVE!</p>';
+else
+echo '
+		<p class="well">You can access all your books, notebooks and drawings here. Please login to access your data.</p>';
 }

@@ -18,7 +18,7 @@ $start_time = microtime();
 
 ob_start();
 
-require $core['includes_dir'] . '/database.php';
+require $core['includes_dir'] . '/database.mysqli.php';
 require $core['includes_dir'] . '/common.php';
 
 $template = array();

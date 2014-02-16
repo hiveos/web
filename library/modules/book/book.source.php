@@ -126,7 +126,7 @@ function book_edit()
 		{
 			$file_size = (int) $_FILES['file']['size'];
 			$file_extension = htmlspecialchars(strtolower(substr(strrchr($_FILES['file']['name'], '.'), 1)), ENT_QUOTES);
-			$file_dir = $core['storage_dir'] . '/shared/' . $id_book . '/pack.' . $file_extension;
+			$file_dir = $core['storage_dir'] . '/shared/temp_s_' . $id_book . '.' . $file_extension;
 
 			if (!is_uploaded_file($_FILES['file']['tmp_name']) || (@ini_get('open_basedir') == '' && !file_exists($_FILES['file']['tmp_name'])))
 				fatal_error('File could not be uploaded!');
@@ -134,15 +134,35 @@ function book_edit()
 			if ($file_size > 10 * 1024 * 1024)
 				fatal_error('Files cannot be larger than 10 MB!');
 
-			if (!in_array($file_extension, array('zip')))
-				fatal_error('Only files with the following extensions can be uploaded: zip');
+			if (!in_array($file_extension, array('pdf')))
+				fatal_error('Only files with the following extensions can be uploaded: pdf');
 
-			@unlink($file_dir);
+			if (file_exists($file_dir))
+				unlink($file_dir);
 
 			if (!move_uploaded_file($_FILES['file']['tmp_name'], $file_dir))
 				fatal_error('File could not be uploaded!');
 
-			extract_pack($file_dir, dirname($file_dir));
+			$target_dir = $core['storage_dir'] . '/shared/' . $id_book . '/page.png';
+
+			$fp = fopen($file_dir, 'rb');
+			$img = new imagick();
+			$img->setResolution(150,150);
+			$img->readImageFile($fp);
+			$img->setImageFormat('png');
+			$img->setImageCompression(imagick::COMPRESSION_JPEG);
+			$img->setImageCompressionQuality(90);
+			$img->setImageUnits(imagick::RESOLUTION_PIXELSPERINCH);
+			$img->writeImages($target_dir, false);
+			$img->clear();
+			fclose($fp);
+
+			unlink($file_dir);
+
+			$temp = list_dir(dirname($target_dir));
+
+			foreach ($temp as $file)
+				rename(dirname($target_dir) . '/' . $file, dirname($target_dir) . '/' . preg_replace('~^page\-(\d+).png$~e', "'page' . ($1 + 1) . '.png'", $file));
 		}
 	}
 
